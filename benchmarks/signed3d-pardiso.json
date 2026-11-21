@@ -1,0 +1,235 @@
+{
+  "profile": "signed-unit-torus-3d-backward80-v2",
+  "machine": {
+    "kernel": "7.2.6-76070206-generic",
+    "architecture": "x86_64",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-1360P",
+    "vcpus": 16,
+    "affinity_vcpus": 16,
+    "memtotal_kib": 65679624,
+    "scratch_root": "/tmp",
+    "scratch_filesystem": "ext4",
+    "scratch_free_bytes_at_start": 3243235844096,
+    "cgroup_memory_limit": null,
+    "cgroup_cpu_limit": null
+  },
+  "binary_sha256": "21f0cb322b72df7370df7459329eb018fe9c84196c1d0c37ccbd2de51d09d5b7",
+  "runs": [
+    {
+      "side": 32,
+      "rows": 32768,
+      "trial": 1,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.024710132000000003,
+          "peak_rss_kib": 6280
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.028977728,
+          "peak_rss_kib": 6532
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.8799825490000001,
+          "peak_rss_kib": 141760,
+          "stderr": "solver=Intel(R) Math Kernel Library Version 2020.0.4 Product Build 20200917 for Intel(R) 64 architecture applications algorithm=PARDISO_64-indefinite threading=GNU threads=1 side=32 n=32768 upper_nnz=131072\nordering_s=0.158591 factor_nnz=11438801\nshifted_LDL_refinements=5 original_backward_2=2.129897023310e-17\nfactor_s=0.641213 triangular_s=0.008546 refinement_and_checks_s=0.050573 relative_rhs_before=2.362224354319e-04 relative_rhs_after=2.341214578323e-15"
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.072877721,
+          "peak_rss_kib": 6240
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.025935185000000003,
+          "peak_rss_kib": 6392
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.10742272800000001,
+          "peak_rss_kib": 6604
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.050557787,
+          "peak_rss_kib": 6388,
+          "stdout": "certified rows=32768 exponent=-9 rho=4005453329130848256 x_squared=176929557333416481016043989437367368251121451663360 relative_rhs=2.3412143781984986e-15 backward_2=2.1298968412492195e-17 target=pass elapsed_ns=988786626 attempt=b2ccd5c6aeff87f351cdaf1a6eca8e3067beadbd943b135409556d89ac0d666e"
+        }
+      },
+      "status": "complete",
+      "proof_bytes": 16716,
+      "legacy_proof_bytes": 16680,
+      "legacy_baseline": "verified archive",
+      "increase_bytes": 36,
+      "seed": "951adb8daf0159e1d915ac129786f19110e2f47f5a0bb5c6946b613044f50a18",
+      "proof_sha256": "a43bd4958d231eb7a1af0e91cb9055212d7252ce0954ceafb172dd9d170b993c",
+      "verified": {
+        "rows": "32768",
+        "exponent": "-9",
+        "rho": "4005453329130848256",
+        "x_squared": "176929557333416481016043989437367368251121451663360",
+        "relative_rhs": "2.3412143781984986e-15",
+        "backward_2": "2.1298968412492195e-17",
+        "target": "pass",
+        "elapsed_ns": "988786626",
+        "attempt": "b2ccd5c6aeff87f351cdaf1a6eca8e3067beadbd943b135409556d89ac0d666e"
+      },
+      "python_oracle": {
+        "exponent": -9,
+        "rho": 4005453329130848256,
+        "x_squared": 176929557333416481016043989437367368251121451663360,
+        "relative_rhs": 2.3412143781984985e-15,
+        "backward_2": 2.1298968412492194e-17
+      },
+      "commit_receipt_elapsed_s": 0.9887866260000001
+    },
+    {
+      "side": 64,
+      "rows": 262144,
+      "trial": 1,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.024228036,
+          "peak_rss_kib": 6300
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.027281453,
+          "peak_rss_kib": 6168
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 35.318434903,
+          "peak_rss_kib": 1846164,
+          "stderr": "solver=Intel(R) Math Kernel Library Version 2020.0.4 Product Build 20200917 for Intel(R) 64 architecture applications algorithm=PARDISO_64-indefinite threading=GNU threads=1 side=64 n=262144 upper_nnz=1048576\nordering_s=1.356722 factor_nnz=198575325\nshifted_LDL_refinements=5 original_backward_2=5.404098569286e-17\nfactor_s=33.060668 triangular_s=0.121550 refinement_and_checks_s=0.670307 relative_rhs_before=1.710774118784e-04 relative_rhs_after=3.362660614122e-14"
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.316610033,
+          "peak_rss_kib": 6224
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.026783097000000002,
+          "peak_rss_kib": 6140
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.5132863830000001,
+          "peak_rss_kib": 6760
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.28068850700000003,
+          "peak_rss_kib": 6540,
+          "stdout": "certified rows=262144 exponent=-9 rho=103286938149535772672 x_squared=719458537572365841582037485420759156260033496223744 relative_rhs=3.3626606352633554e-14 backward_2=5.4040986032627447e-17 target=pass elapsed_ns=35674229378 attempt=7c4f93da0fd731879308be7e20c9fa5ca73c1d508882714a9250a69ea54b20c8"
+        }
+      },
+      "status": "complete",
+      "proof_bytes": 37580,
+      "legacy_proof_bytes": 37544,
+      "legacy_baseline": "verified archive",
+      "increase_bytes": 36,
+      "seed": "5bbe521385616bdb594015824758449f3711079dfb1d568d853846fedcf0a243",
+      "proof_sha256": "242633bd44addfae755b8d2e2e9708c6ca08ce7b480be6fec5711c876234f85f",
+      "verified": {
+        "rows": "262144",
+        "exponent": "-9",
+        "rho": "103286938149535772672",
+        "x_squared": "719458537572365841582037485420759156260033496223744",
+        "relative_rhs": "3.3626606352633554e-14",
+        "backward_2": "5.4040986032627447e-17",
+        "target": "pass",
+        "elapsed_ns": "35674229378",
+        "attempt": "7c4f93da0fd731879308be7e20c9fa5ca73c1d508882714a9250a69ea54b20c8"
+      },
+      "python_oracle": {
+        "exponent": -9,
+        "rho": 103286938149535772672,
+        "x_squared": 719458537572365841582037485420759156260033496223744,
+        "relative_rhs": 3.3626606352633557e-14,
+        "backward_2": 5.404098603262745e-17
+      },
+      "commit_receipt_elapsed_s": 35.674229378
+    }
+  ],
+  "solver": "stencil-direct3d",
+  "solver_binary_sha256": "1cb0619920b1885981117e7b1226505230465abf8184e8eeb119b834e7849895",
+  "solver_threads_limit": 1,
+  "mkl_dynamic": "FALSE",
+  "summary": {
+    "32": {
+      "completed_trials": 1,
+      "stages": {
+        "keygen": {
+          "wall_s": 0.024710132000000003,
+          "peak_rss_kib": 6280
+        },
+        "start": {
+          "wall_s": 0.028977728,
+          "peak_rss_kib": 6532
+        },
+        "solve": {
+          "wall_s": 0.8799825490000001,
+          "peak_rss_kib": 141760
+        },
+        "commit": {
+          "wall_s": 0.072877721,
+          "peak_rss_kib": 6240
+        },
+        "stamp": {
+          "wall_s": 0.025935185000000003,
+          "peak_rss_kib": 6392
+        },
+        "prove": {
+          "wall_s": 0.10742272800000001,
+          "peak_rss_kib": 6604
+        },
+        "verify": {
+          "wall_s": 0.050557787,
+          "peak_rss_kib": 6388
+        }
+      },
+      "proof_bytes": 16716,
+      "commit_receipt_elapsed_s": 0.9887866260000001
+    },
+    "64": {
+      "completed_trials": 1,
+      "stages": {
+        "keygen": {
+          "wall_s": 0.024228036,
+          "peak_rss_kib": 6300
+        },
+        "start": {
+          "wall_s": 0.027281453,
+          "peak_rss_kib": 6168
+        },
+        "solve": {
+          "wall_s": 35.318434903,
+          "peak_rss_kib": 1846164
+        },
+        "commit": {
+          "wall_s": 0.316610033,
+          "peak_rss_kib": 6224
+        },
+        "stamp": {
+          "wall_s": 0.026783097000000002,
+          "peak_rss_kib": 6140
+        },
+        "prove": {
+          "wall_s": 0.5132863830000001,
+          "peak_rss_kib": 6760
+        },
+        "verify": {
+          "wall_s": 0.28068850700000003,
+          "peak_rss_kib": 6540
+        }
+      },
+      "proof_bytes": 37580,
+      "commit_receipt_elapsed_s": 35.674229378
+    }
+  }
+}

@@ -1,0 +1,574 @@
+{
+  "kernel": "7.2.6-76070206-generic",
+  "machine": "x86_64",
+  "cpu": "13th Gen Intel(R) Core(TM) i7-1360P",
+  "binary_sha256": "4b6cfdda1b8981ca47536e9766fe151a4198b231ddf500d4b77132d6e3f91673",
+  "memory_unit": "KiB, peak resident set from Linux wait4 for each individual process",
+  "scratch": "/tmp",
+  "runs": [
+    {
+      "side": 512,
+      "rows": 262144,
+      "trial": 1,
+      "stages": {
+        "keygen": {
+          "wall_s": 0.029793858,
+          "peak_rss_kib": 5932
+        },
+        "start": {
+          "wall_s": 0.030541703,
+          "peak_rss_kib": 6308
+        },
+        "solve": {
+          "wall_s": 0.152576002,
+          "peak_rss_kib": 15944
+        },
+        "commit": {
+          "wall_s": 0.263123148,
+          "peak_rss_kib": 6036
+        },
+        "stamp": {
+          "wall_s": 0.028413278,
+          "peak_rss_kib": 6060
+        },
+        "prove": {
+          "wall_s": 0.3932236,
+          "peak_rss_kib": 6748
+        },
+        "verify": {
+          "wall_s": 0.277390852,
+          "peak_rss_kib": 6608
+        }
+      },
+      "seed": "1545592ccccd4b0f0f091fa611878a3c24a4cd2b5f9dc125d642410c81c5505f",
+      "signed_start_hex": "53544e5354413031000200000000000077eeb963cdf3e81813c25f0e486189316b9a7159bec756ea6226324b1dfc91b6e7c418e0096647eeaa5bd04845e1da89bab550fd480b70ca9c64465facdfb6f767e7f12bf4ad87507365656465642d7374656e63696c2d65786163742d726573696475616c2d76310000000000000000fb28166ca2385999469beb0a36ab199f33fa4a5719ddacc26c664d889b22a828779f80879fa668b8ee2cfa41327d037ce0f6c9d553ee463c704e8ab77fe88504",
+      "public_key_hex": "dd6366fde470ee8d47d8f92eac70e4de2f0850edcc68474260fd87343837cb8b",
+      "commitment_digest": "f44468baf14f1a87992417e75fa892f316cd9ebab5ca66644e4e62390736e6f2",
+      "attempt": "a8a15c309fef002a0585db3385da603d8f36e8d8a377367a8bae31740499bb9f",
+      "commit_receipt_elapsed_s": 0.447039467,
+      "proof_bytes": 37544,
+      "proof_sha256": "205343b52981a42bff329d6ef13f13552005f024098aa6c6db2ef6660deb03d5",
+      "solver_output": "CG iterations 43 + 16 refinement, relative RHS residual 6.7642e-15 -> 7.0031e-17",
+      "verified": {
+        "rho": 107172556,
+        "relative_rhs": "7.01507122372e-17",
+        "target": "pass"
+      }
+    },
+    {
+      "side": 512,
+      "rows": 262144,
+      "trial": 2,
+      "stages": {
+        "keygen": {
+          "wall_s": 0.038277453,
+          "peak_rss_kib": 6328
+        },
+        "start": {
+          "wall_s": 0.031932861,
+          "peak_rss_kib": 6284
+        },
+        "solve": {
+          "wall_s": 0.138604729,
+          "peak_rss_kib": 15992
+        },
+        "commit": {
+          "wall_s": 0.268793139,
+          "peak_rss_kib": 6340
+        },
+        "stamp": {
+          "wall_s": 0.029262232,
+          "peak_rss_kib": 6248
+        },
+        "prove": {
+          "wall_s": 0.388357623,
+          "peak_rss_kib": 6572
+        },
+        "verify": {
+          "wall_s": 0.26925453,
+          "peak_rss_kib": 6592
+        }
+      },
+      "seed": "7ef04200e6088d4a5b6efa7d94be1785123324b1950ad45d86ea6d54be67a948",
+      "signed_start_hex": "53544e5354413031000200000000000030b1ffaacdf3e81823c9e80bf1f3e9911fd7e2f5f989f2f5f13908b1781813f4b95d3574b344d749f69ad3de22c9ee6246478e46f6a6dd57e60dc4784389c2df18db39b783e73f917365656465642d7374656e63696c2d65786163742d726573696475616c2d76310000000000000000974dd6f475663b4d09b720bfb94752d1f2ac5d8dacc806cde3880e280a9dd3ee219a98949817d184590d22821141757126153f3e70cbdc4c68e2b4b07b811e05",
+      "public_key_hex": "d1c21e00b3107c1da54f8deb9833facfef439c49c3a3a3cdfbf728954de5e87c",
+      "commitment_digest": "235620e41342aa74ee7a0ef86a8b5eafa8a78b7633275cb68eb9c2b48e17ad37",
+      "attempt": "b227fa663d0711f0c8cb257bcfe2df8b3900460da54c35f9b0659e7fe4786fff",
+      "commit_receipt_elapsed_s": 0.441405528,
+      "proof_bytes": 37544,
+      "proof_sha256": "550153a11e9b00456054e1e6317b8c55c9433db9a6e442b6eb6aed7333832e99",
+      "solver_output": "CG iterations 43 + 16 refinement, relative RHS residual 7.1982e-15 -> 7.0184e-17",
+      "verified": {
+        "rho": 107628233,
+        "relative_rhs": "7.02996876884e-17",
+        "target": "pass"
+      }
+    },
+    {
+      "side": 512,
+      "rows": 262144,
+      "trial": 3,
+      "stages": {
+        "keygen": {
+          "wall_s": 0.030873036,
+          "peak_rss_kib": 6316
+        },
+        "start": {
+          "wall_s": 0.032009862,
+          "peak_rss_kib": 6208
+        },
+        "solve": {
+          "wall_s": 0.144683063,
+          "peak_rss_kib": 16064
+        },
+        "commit": {
+          "wall_s": 0.269926646,
+          "peak_rss_kib": 6440
+        },
+        "stamp": {
+          "wall_s": 0.030075727,
+          "peak_rss_kib": 6192
+        },
+        "prove": {
+          "wall_s": 0.387426292,
+          "peak_rss_kib": 6592
+        },
+        "verify": {
+          "wall_s": 0.269592124,
+          "peak_rss_kib": 6532
+        }
+      },
+      "seed": "e30f8e1ad3753c9d2670b79294d1af3d0a1a8ce9054a5bdd82698b2b579cb27f",
+      "signed_start_hex": "53544e53544130310002000000000000c488bbf0cdf3e818ad2eb379211590f71e3c6c97c9a79624055c0aa6539161b82d524a64c361c7b89f49b79e28211e0aff11fd9550f61bf122f6b52dbb625e49a3f748d606e3de237365656465642d7374656e63696c2d65786163742d726573696475616c2d763100000000000000001c8a769cf14a4d926a4ac207256d715605f40b4786fb3f7c7d07fe0d5ec204dc0ee59127bf0544277bad2ea27ca23ddd73e5adb6a2eb03213f3f6453ed266803",
+      "public_key_hex": "7b85ba963ede7dd3f5529a43109c9f64fbf8db9c34b27954f02df8aaa29e24ef",
+      "commitment_digest": "ecf9d96bb8f2929c574a2c738ce7d0020029dc649d5c8457b7cee80f079b03eb",
+      "attempt": "00ac7de08d2e902285a790fe087a6d66cc970b387d101a8fc37008923b5939cf",
+      "commit_receipt_elapsed_s": 0.448207744,
+      "proof_bytes": 37544,
+      "proof_sha256": "aebdb16d802ef6d1d7db00a8cc24f52b17b06c5a6dfedd87be7a384d44aa86c3",
+      "solver_output": "CG iterations 43 + 16 refinement, relative RHS residual 6.4861e-15 -> 7.0303e-17",
+      "verified": {
+        "rho": 108001315,
+        "relative_rhs": "7.04214255349e-17",
+        "target": "pass"
+      }
+    },
+    {
+      "side": 1024,
+      "rows": 1048576,
+      "trial": 1,
+      "stages": {
+        "keygen": {
+          "wall_s": 0.028926453,
+          "peak_rss_kib": 6264
+        },
+        "start": {
+          "wall_s": 0.033528436,
+          "peak_rss_kib": 6316
+        },
+        "solve": {
+          "wall_s": 0.584506453,
+          "peak_rss_kib": 46744
+        },
+        "commit": {
+          "wall_s": 0.836105968,
+          "peak_rss_kib": 6304
+        },
+        "stamp": {
+          "wall_s": 0.031227932,
+          "peak_rss_kib": 6252
+        },
+        "prove": {
+          "wall_s": 1.452005422,
+          "peak_rss_kib": 6684
+        },
+        "verify": {
+          "wall_s": 0.932932165,
+          "peak_rss_kib": 6536
+        }
+      },
+      "seed": "f3f15242b41208011a22fb090157a694c04bf7ad4fb201f395cafcd93c129b7a",
+      "signed_start_hex": "53544e535441303100040000000000002ae2d936cef3e818f351443c4f26f92116c0ae78968e0d65af9d084d2cd5a3f42095a98a29f9d2ec1cac60cd89c9de8b8fcf6025c2bbfaab81e8b596e95c690311735c4b028c23847365656465642d7374656e63696c2d65786163742d726573696475616c2d7631000000000000000017eb45091d2d7e641cf5c3bf68d4e553438eeaab8ce1bc9abaee5c9787670ab61692d72925b0ce9e0126c635eaf596e85bd231427c898a6ddf9b63a539c32803",
+      "public_key_hex": "c6388878e4f42a57686a67f0d4bfb7796b86ab6bf1c8dc0a8e3fbd01ea48d18d",
+      "commitment_digest": "bc2e524f75b4688073dca612d00df504f70e5725361966482ceeaf0a2db22d46",
+      "attempt": "8ccab17af11ea744bb15bf8e388daf93bdf1a6450031f2fb754a2a5496bc5dd9",
+      "commit_receipt_elapsed_s": 1.455300162,
+      "proof_bytes": 70568,
+      "proof_sha256": "f11262bf0c1152e4e72ec3585cb27563527235835c308bb2ad72f77ce4c5892c",
+      "solver_output": "CG iterations 43 + 16 refinement, relative RHS residual 7.2140e-15 -> 7.0267e-17",
+      "verified": {
+        "rho": 431605546,
+        "relative_rhs": "7.03888391912e-17",
+        "target": "pass"
+      }
+    },
+    {
+      "side": 1024,
+      "rows": 1048576,
+      "trial": 2,
+      "stages": {
+        "keygen": {
+          "wall_s": 0.033292861,
+          "peak_rss_kib": 6304
+        },
+        "start": {
+          "wall_s": 0.030628131,
+          "peak_rss_kib": 6504
+        },
+        "solve": {
+          "wall_s": 0.597753832,
+          "peak_rss_kib": 46652
+        },
+        "commit": {
+          "wall_s": 0.887075292,
+          "peak_rss_kib": 6440
+        },
+        "stamp": {
+          "wall_s": 0.033344383,
+          "peak_rss_kib": 6384
+        },
+        "prove": {
+          "wall_s": 1.391540127,
+          "peak_rss_kib": 6712
+        },
+        "verify": {
+          "wall_s": 0.935869536,
+          "peak_rss_kib": 6620
+        }
+      },
+      "seed": "a44bbba464104ea19a9c5be5c706457c1baede7b6b2e925c3807aa70d875cc9d",
+      "signed_start_hex": "53544e53544130310004000000000000c7a24e20cff3e818dd721cbd134c9ccaa19fc928f7a36f5ea8d95887806bfa47891a18929777fd0ae2b6f6004cd8b8192fdb4de2ac6727f6615167a51f88a14f6805e8d153a60cd47365656465642d7374656e63696c2d65786163742d726573696475616c2d763100000000000000005f647c9f261c9305e88186d388f4ca36e81acbbb7f5611f43c65b0754cc15831dc0c4f88de8aeda2755ca99beb3a719bcdcf8ef5a9231f7f0d3085be45bc2a0f",
+      "public_key_hex": "22b0cedfb309f384bf3356528b2782643e072f9b2b6ac008b73a5ec38a2c5cb4",
+      "commitment_digest": "79f9c058eed142b343d3103cab538a091953cae5b6bc08d3704647fcd215352d",
+      "attempt": "04a04b8be827f6029a7dc3b8a894ee2bd92b9f21ca7d034f65159d0f418924e4",
+      "commit_receipt_elapsed_s": 1.51766131,
+      "proof_bytes": 70568,
+      "proof_sha256": "0396ec79f1c5bff498b7ccce8355737be45594101e6b6dc3b9ed0e93a5929b95",
+      "solver_output": "CG iterations 43 + 16 refinement, relative RHS residual 7.3868e-15 -> 7.0135e-17",
+      "verified": {
+        "rho": 429977026,
+        "relative_rhs": "7.02559192517e-17",
+        "target": "pass"
+      }
+    },
+    {
+      "side": 1024,
+      "rows": 1048576,
+      "trial": 3,
+      "stages": {
+        "keygen": {
+          "wall_s": 0.034601085,
+          "peak_rss_kib": 6296
+        },
+        "start": {
+          "wall_s": 0.034024058,
+          "peak_rss_kib": 6320
+        },
+        "solve": {
+          "wall_s": 0.595195596,
+          "peak_rss_kib": 46628
+        },
+        "commit": {
+          "wall_s": 0.873113504,
+          "peak_rss_kib": 6308
+        },
+        "stamp": {
+          "wall_s": 0.033482405,
+          "peak_rss_kib": 6188
+        },
+        "prove": {
+          "wall_s": 1.390714946,
+          "peak_rss_kib": 6680
+        },
+        "verify": {
+          "wall_s": 0.977208662,
+          "peak_rss_kib": 6580
+        }
+      },
+      "seed": "74f9ee8d7f390c317bdfb994d9c724d9e1fac167fe6b086d1432e97bc8349319",
+      "signed_start_hex": "53544e535441303100040000000000003750450ad0f3e818538877a1cfef5646637c47617bab9b072c9be35412a4c23ba37ef4110ee26d7f1d8a6214e3382f3e1579d7cc711603d463eaa91341213cc934a6dbe0505aeeb47365656465642d7374656e63696c2d65786163742d726573696475616c2d7631000000000000000031f5b69060dbd4ea73b275323a1b550a68b69ca94e84275cb630c83f4692e91c37458845fa12ba84116d53d4debdae4a54d777a50bab77d1b396bc852571de0f",
+      "public_key_hex": "f1045a355ab6d66f0e12a91b5755c253aea0ef7e43d59a3d637b107c3c39fdfb",
+      "commitment_digest": "9f59021969a191f9365a02b23ccf8eb9c33a20d9d5834e08c8ccde288a0bc0b3",
+      "attempt": "0d7f537279e62b90c6dc977cefcd9c9fc2d95b21269a5a1529f2e59ed26d35e3",
+      "commit_receipt_elapsed_s": 1.505071518,
+      "proof_bytes": 70568,
+      "proof_sha256": "3d0d56fa0a21dffbacbfec0c53c840c6ecce578161535adf882d9dc1b0a2aa76",
+      "solver_output": "CG iterations 43 + 16 refinement, relative RHS residual 7.4021e-15 -> 7.0370e-17",
+      "verified": {
+        "rho": 432796892,
+        "relative_rhs": "7.04859181969e-17",
+        "target": "pass"
+      },
+      "hard_cap": {
+        "address_limit_bytes": 33554432,
+        "solve": {
+          "wall_s": 0.002387567,
+          "peak_rss_kib": 5936
+        },
+        "solve_result": "solver allocation failed for 1048576 rows",
+        "prove": {
+          "wall_s": 1.391237742,
+          "peak_rss_kib": 6720
+        },
+        "verify": {
+          "wall_s": 0.936470514,
+          "peak_rss_kib": 6456
+        }
+      }
+    },
+    {
+      "side": 2048,
+      "rows": 4194304,
+      "trial": 1,
+      "stages": {
+        "keygen": {
+          "wall_s": 0.032353625,
+          "peak_rss_kib": 6316
+        },
+        "start": {
+          "wall_s": 0.032964709,
+          "peak_rss_kib": 6372
+        },
+        "solve": {
+          "wall_s": 2.376312485,
+          "peak_rss_kib": 169540
+        },
+        "commit": {
+          "wall_s": 2.865447159,
+          "peak_rss_kib": 6612
+        },
+        "stamp": {
+          "wall_s": 0.028354955,
+          "peak_rss_kib": 6100
+        },
+        "prove": {
+          "wall_s": 5.377807388,
+          "peak_rss_kib": 6560
+        },
+        "verify": {
+          "wall_s": 3.587863353,
+          "peak_rss_kib": 6844
+        }
+      },
+      "seed": "e3501e590bcf64d5f2bca0aee813cd265d01014fdc48f98659437bc9da440228",
+      "signed_start_hex": "53544e535441303100080000000000007feecd80d1f3e81852df1f53da78370b16929cd9cef37ff67bfa89f911d78ceb97a6a692952651dc5ca8f15108b4ee4a8ef54800174463b1305183baa61e081c17af74e1130380da7365656465642d7374656e63696c2d65786163742d726573696475616c2d763100000000000000005c983350cd3b42140cdc5eaadd264b666377f665411ce9203cb08fef2bf9a541195f35e36291a82559a4d89e1f23bfb73ac068e85904746537fea6d26845a70b",
+      "public_key_hex": "7a6e7992327a0bd6766505db60001e5d2faf935e3788f75ff4ed538ff0c9778f",
+      "commitment_digest": "191e72736ee99789e06054d0d42497a8bfe198b03687bb67ecfa060c6e0dfd73",
+      "attempt": "82dfd5df861d29e6e6a737c043ffcd0c127631e106560619beadf5e47458a65e",
+      "commit_receipt_elapsed_s": 5.278147875,
+      "proof_bytes": 136360,
+      "proof_sha256": "ebd7f61f05959f8707c3f3959a4c1b9e0a1b6b62a2b15a43e2d8e02847634041",
+      "solver_output": "CG iterations 43 + 16 refinement, relative RHS residual 9.8749e-15 -> 7.0276e-17",
+      "verified": {
+        "rho": 1726735787,
+        "relative_rhs": "7.03952319348e-17",
+        "target": "pass"
+      }
+    },
+    {
+      "side": 2048,
+      "rows": 4194304,
+      "trial": 2,
+      "stages": {
+        "keygen": {
+          "wall_s": 0.026489867,
+          "peak_rss_kib": 6304
+        },
+        "start": {
+          "wall_s": 0.030070448,
+          "peak_rss_kib": 6332
+        },
+        "solve": {
+          "wall_s": 2.418808251,
+          "peak_rss_kib": 169524
+        },
+        "commit": {
+          "wall_s": 3.061875669,
+          "peak_rss_kib": 6612
+        },
+        "stamp": {
+          "wall_s": 0.024179177,
+          "peak_rss_kib": 6336
+        },
+        "prove": {
+          "wall_s": 5.377861137,
+          "peak_rss_kib": 6772
+        },
+        "verify": {
+          "wall_s": 3.568194904,
+          "peak_rss_kib": 6864
+        }
+      },
+      "seed": "3a2cd18263375b9efe4e671fcd3aba8371996cab76ee1cde8b66f518737a64a5",
+      "signed_start_hex": "53544e53544130310008000000000000c878dad5d4f3e8184991107755b5f3258be01cdef12941d9c6d0c6d8d2d413e01c06e4dea59838fe58f357b38874dcaf986f0a5311086d4b31e3e60cf1b965ec20784e0b4398498f7365656465642d7374656e63696c2d65786163742d726573696475616c2d763100000000000000009dfa0cfc92d901256fac833ae87479c84269f290f7a9c49802d76bb2be2ab87e576a37440dca30075bd5cc10e948486b518a6fcc9be00ce44ea38facf9cd3700",
+      "public_key_hex": "58044381b685c1526c28a4c31ddf6bcf5b426aae765ad0e2958615aadc798639",
+      "commitment_digest": "087865ac2f7f1db4f5b6314bdd80e9b674a41f58034c099854d522ab3a8bebf3",
+      "attempt": "19dffa544ac2a17468373994e783725249430c83a2db25c0648450ac690da0c6",
+      "commit_receipt_elapsed_s": 5.511794929,
+      "proof_bytes": 136360,
+      "proof_sha256": "aa6bc36f340f7a9125c99e91dcbc168fc233b9ef256e4da62097ba258f938bd4",
+      "solver_output": "CG iterations 43 + 16 refinement, relative RHS residual 9.1289e-15 -> 7.0317e-17",
+      "verified": {
+        "rho": 1728832532,
+        "relative_rhs": "7.04379588162e-17",
+        "target": "pass"
+      }
+    },
+    {
+      "side": 2048,
+      "rows": 4194304,
+      "trial": 3,
+      "stages": {
+        "keygen": {
+          "wall_s": 0.027086445,
+          "peak_rss_kib": 6312
+        },
+        "start": {
+          "wall_s": 0.029989405,
+          "peak_rss_kib": 6364
+        },
+        "solve": {
+          "wall_s": 2.376012763,
+          "peak_rss_kib": 169504
+        },
+        "commit": {
+          "wall_s": 2.87112586,
+          "peak_rss_kib": 6616
+        },
+        "stamp": {
+          "wall_s": 0.025929003,
+          "peak_rss_kib": 6192
+        },
+        "prove": {
+          "wall_s": 5.402305889,
+          "peak_rss_kib": 6800
+        },
+        "verify": {
+          "wall_s": 3.726467022,
+          "peak_rss_kib": 6720
+        }
+      },
+      "seed": "94161dde8e07f212dcf127073a3d30f5c21cbba792b52e81888d86ae98dc8189",
+      "signed_start_hex": "53544e53544130310008000000000000a47e7c37d8f3e8184b7fcc944b9aa24d18a7cc2b3200a4f7756dd10008cd2cd9b87e3862b7daa9400612a88644aa21c6ee18ada6a4dfab3cb24666a4e71139d08c839b4d187832197365656465642d7374656e63696c2d65786163742d726573696475616c2d763100000000000000001ac31ae8cbeaf0440909041883cc576c07c73b7540bd79af27dc3e034749010eabb8f50fd448076e63c7364ef74bfe204fae4a8275ec252c3a6e4857f1b68e05",
+      "public_key_hex": "87ef78c4f76087987773c84b5b497f63b07503d98b2c14445b9d09433efd13b9",
+      "commitment_digest": "b87c03fe866f883d73db4bb8bec8d89110526f72d0e847858be455fabe37dfe8",
+      "attempt": "7c0ea97b9d96a435dae7cf7717258e11c1829eafd34b418ba9fa6af4ef7f471d",
+      "commit_receipt_elapsed_s": 5.278464286,
+      "proof_bytes": 136360,
+      "proof_sha256": "f09179bea65abc1ae5c5783876d8e441a4137d2937a6309daaa758697939cf41",
+      "solver_output": "CG iterations 43 + 16 refinement, relative RHS residual 8.7364e-15 -> 7.0398e-17",
+      "verified": {
+        "rho": 1732769977,
+        "relative_rhs": "7.05181250117e-17",
+        "target": "pass"
+      }
+    }
+  ],
+  "medians": {
+    "512": {
+      "trials": 3,
+      "stages": {
+        "keygen": {
+          "wall_s": 0.030873036,
+          "peak_rss_kib": 6316
+        },
+        "start": {
+          "wall_s": 0.031932861,
+          "peak_rss_kib": 6284
+        },
+        "solve": {
+          "wall_s": 0.144683063,
+          "peak_rss_kib": 15992
+        },
+        "commit": {
+          "wall_s": 0.268793139,
+          "peak_rss_kib": 6340
+        },
+        "stamp": {
+          "wall_s": 0.029262232,
+          "peak_rss_kib": 6192
+        },
+        "prove": {
+          "wall_s": 0.388357623,
+          "peak_rss_kib": 6592
+        },
+        "verify": {
+          "wall_s": 0.269592124,
+          "peak_rss_kib": 6592
+        }
+      },
+      "proof_bytes": 37544,
+      "commit_receipt_elapsed_s": 0.447039467
+    },
+    "1024": {
+      "trials": 3,
+      "stages": {
+        "keygen": {
+          "wall_s": 0.033292861,
+          "peak_rss_kib": 6296
+        },
+        "start": {
+          "wall_s": 0.033528436,
+          "peak_rss_kib": 6320
+        },
+        "solve": {
+          "wall_s": 0.595195596,
+          "peak_rss_kib": 46652
+        },
+        "commit": {
+          "wall_s": 0.873113504,
+          "peak_rss_kib": 6308
+        },
+        "stamp": {
+          "wall_s": 0.033344383,
+          "peak_rss_kib": 6252
+        },
+        "prove": {
+          "wall_s": 1.391540127,
+          "peak_rss_kib": 6684
+        },
+        "verify": {
+          "wall_s": 0.935869536,
+          "peak_rss_kib": 6580
+        }
+      },
+      "proof_bytes": 70568,
+      "commit_receipt_elapsed_s": 1.505071518
+    },
+    "2048": {
+      "trials": 3,
+      "stages": {
+        "keygen": {
+          "wall_s": 0.027086445,
+          "peak_rss_kib": 6312
+        },
+        "start": {
+          "wall_s": 0.030070448,
+          "peak_rss_kib": 6364
+        },
+        "solve": {
+          "wall_s": 2.376312485,
+          "peak_rss_kib": 169524
+        },
+        "commit": {
+          "wall_s": 2.87112586,
+          "peak_rss_kib": 6612
+        },
+        "stamp": {
+          "wall_s": 0.025929003,
+          "peak_rss_kib": 6192
+        },
+        "prove": {
+          "wall_s": 5.377861137,
+          "peak_rss_kib": 6772
+        },
+        "verify": {
+          "wall_s": 3.587863353,
+          "peak_rss_kib": 6844
+        }
+      },
+      "proof_bytes": 136360,
+      "commit_receipt_elapsed_s": 5.278464286
+    }
+  }
+}

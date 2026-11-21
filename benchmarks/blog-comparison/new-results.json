@@ -1,0 +1,2124 @@
+{
+  "machine": {
+    "kernel": "7.2.6-76070206-generic",
+    "architecture": "x86_64",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-1360P",
+    "vcpus": 16,
+    "affinity_vcpus": 16,
+    "memtotal_kib": 65679624,
+    "scratch_root": "/tmp",
+    "scratch_filesystem": "ext4",
+    "scratch_free_bytes_at_start": 3243186388992,
+    "cgroup_memory_limit": null,
+    "cgroup_cpu_limit": null
+  },
+  "protocol_binary_sha256": "9b1d27ed2c6763660e1dd0edaa03dfcd88d9286549e2e1b11f3ebf1b04abd0a2",
+  "july_checkout": "be8b67b74da54d162df2e6e0a9d813779959bb60",
+  "july_example": {
+    "schema": "sparse-solution/problem/v1",
+    "challenge_nonce": "9f36a2c4d7815be0084d63a912f7c5b34e1860dafb295c73a6418ed02bc9574f",
+    "matrix": {
+      "kind": "diagonally-dominant-tridiagonal-v2",
+      "dimension": 16
+    },
+    "rhs": {
+      "kind": "seeded-dyadic-v1"
+    },
+    "acceptance": {
+      "kind": "reported-squared-l2-residual-v1",
+      "residual_magnitude_bits": 68
+    },
+    "proof_profile": "whir-field192-l2-v4"
+  },
+  "rss_method": "Linux wait4.ru_maxrss, KiB, fresh process per stage",
+  "threads": 1,
+  "runs": [
+    {
+      "rows": 1024,
+      "trial": 1,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.028356278000000002,
+          "peak_rss_kib": 6308
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.031341957000000004,
+          "peak_rss_kib": 6516
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.006515536000000001,
+          "peak_rss_kib": 5852
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.034331479000000005,
+          "peak_rss_kib": 6320
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.033191553,
+          "peak_rss_kib": 6264
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.018648891,
+          "peak_rss_kib": 6608
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.0134245,
+          "peak_rss_kib": 6612,
+          "stdout": "certified rows=1024 exponent=1 rho=19693678220537757696 x_squared=35556823496661366436771892663126547927477858074624 relative_rhs=7.9699985296013582e-17 backward_2_upper=3.8489224607731622e-17 target=pass elapsed_ns=93522235 attempt=6cc287fb0d78c2cb96ff41b1e1a2b2cb46193d01fe19738c5e31c9264d2b7993"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "1024",
+        "exponent": "1",
+        "rho": "19693678220537757696",
+        "x_squared": "35556823496661366436771892663126547927477858074624",
+        "relative_rhs": "7.9699985296013582e-17",
+        "backward_2_upper": "3.8489224607731622e-17",
+        "target": "pass",
+        "elapsed_ns": "93522235",
+        "attempt": "6cc287fb0d78c2cb96ff41b1e1a2b2cb46193d01fe19738c5e31c9264d2b7993"
+      },
+      "proof_bytes": 5836,
+      "peak_large_scratch_bytes": 32768,
+      "proof_sha256": "8a49124e8e760ca762f0f35ac20db9c293212eba8b05a371cb6554b3925d41da",
+      "commit_prove_max_rss_kib": 6608,
+      "solve_commit_prove_max_rss_kib": 6608
+    },
+    {
+      "rows": 1024,
+      "trial": 2,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.029504957000000002,
+          "peak_rss_kib": 6308
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.028751932,
+          "peak_rss_kib": 6396
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.004574137000000001,
+          "peak_rss_kib": 6040
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.022469538,
+          "peak_rss_kib": 6276
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.030426096000000003,
+          "peak_rss_kib": 6364
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.024924796000000003,
+          "peak_rss_kib": 6548
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.012917685000000002,
+          "peak_rss_kib": 6552,
+          "stdout": "certified rows=1024 exponent=1 rho=19693678220537757696 x_squared=35556823496661366436771892663126547927477858074624 relative_rhs=7.9699985296013582e-17 backward_2_upper=3.8489224607731622e-17 target=pass elapsed_ns=64539789 attempt=c435eae8b5c9f185d422bb8998858a17e8884dc0b40fefd712d402cbbbb8339b"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "1024",
+        "exponent": "1",
+        "rho": "19693678220537757696",
+        "x_squared": "35556823496661366436771892663126547927477858074624",
+        "relative_rhs": "7.9699985296013582e-17",
+        "backward_2_upper": "3.8489224607731622e-17",
+        "target": "pass",
+        "elapsed_ns": "64539789",
+        "attempt": "c435eae8b5c9f185d422bb8998858a17e8884dc0b40fefd712d402cbbbb8339b"
+      },
+      "proof_bytes": 5836,
+      "peak_large_scratch_bytes": 32768,
+      "proof_sha256": "231d886cef2227edd452a689bee3407d79cea29bc17f44a1b64858df655952dd",
+      "commit_prove_max_rss_kib": 6548,
+      "solve_commit_prove_max_rss_kib": 6548
+    },
+    {
+      "rows": 1024,
+      "trial": 3,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.032277946,
+          "peak_rss_kib": 6296
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.036629618,
+          "peak_rss_kib": 6396
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.007322737,
+          "peak_rss_kib": 5996
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.020902495,
+          "peak_rss_kib": 6236
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.028308769,
+          "peak_rss_kib": 6236
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.022159113,
+          "peak_rss_kib": 6768
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.016597637000000002,
+          "peak_rss_kib": 6480,
+          "stdout": "certified rows=1024 exponent=1 rho=19693678220537757696 x_squared=35556823496661366436771892663126547927477858074624 relative_rhs=7.9699985296013582e-17 backward_2_upper=3.8489224607731622e-17 target=pass elapsed_ns=70764535 attempt=47ceed888026e0c227d341fc60286f9417b91ef5221eaf992b19cc49f3439cae"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "1024",
+        "exponent": "1",
+        "rho": "19693678220537757696",
+        "x_squared": "35556823496661366436771892663126547927477858074624",
+        "relative_rhs": "7.9699985296013582e-17",
+        "backward_2_upper": "3.8489224607731622e-17",
+        "target": "pass",
+        "elapsed_ns": "70764535",
+        "attempt": "47ceed888026e0c227d341fc60286f9417b91ef5221eaf992b19cc49f3439cae"
+      },
+      "proof_bytes": 5836,
+      "peak_large_scratch_bytes": 32768,
+      "proof_sha256": "c5b7f4e9571b5c2e7952dfe1cd689cb6a0da42d9f7495c1c5f2277d1cabb4609",
+      "commit_prove_max_rss_kib": 6768,
+      "solve_commit_prove_max_rss_kib": 6768
+    },
+    {
+      "rows": 2048,
+      "trial": 1,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.029776882,
+          "peak_rss_kib": 6152
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.032615843000000005,
+          "peak_rss_kib": 6520
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.00245426,
+          "peak_rss_kib": 6040
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.020165667,
+          "peak_rss_kib": 6252
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.031657120000000004,
+          "peak_rss_kib": 6332
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.028395424000000002,
+          "peak_rss_kib": 6720
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.014052119,
+          "peak_rss_kib": 6416,
+          "stdout": "certified rows=2048 exponent=1 rho=39399178390097362944 x_squared=71133381496198443654882923674876045658950301908992 relative_rhs=7.9711945205981161e-17 backward_2_upper=3.8490294808621682e-17 target=pass elapsed_ns=58909152 attempt=e8855e3e082c63db79b131eb1f1f89e13c86a8fee1575871af032affbbb0b01a"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "2048",
+        "exponent": "1",
+        "rho": "39399178390097362944",
+        "x_squared": "71133381496198443654882923674876045658950301908992",
+        "relative_rhs": "7.9711945205981161e-17",
+        "backward_2_upper": "3.8490294808621682e-17",
+        "target": "pass",
+        "elapsed_ns": "58909152",
+        "attempt": "e8855e3e082c63db79b131eb1f1f89e13c86a8fee1575871af032affbbb0b01a"
+      },
+      "proof_bytes": 6988,
+      "peak_large_scratch_bytes": 65536,
+      "proof_sha256": "f89458fb239dfeb75813747875f17b0942e4da1eaa7c77c6e563aa3f46a74bf3",
+      "commit_prove_max_rss_kib": 6720,
+      "solve_commit_prove_max_rss_kib": 6720
+    },
+    {
+      "rows": 2048,
+      "trial": 2,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.028669423000000003,
+          "peak_rss_kib": 6300
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.038411974,
+          "peak_rss_kib": 6496
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.005684574,
+          "peak_rss_kib": 6020
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.032457121000000005,
+          "peak_rss_kib": 6400
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.032911831,
+          "peak_rss_kib": 6396
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.030435608000000003,
+          "peak_rss_kib": 6844
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.022113590000000002,
+          "peak_rss_kib": 6540,
+          "stdout": "certified rows=2048 exponent=1 rho=39399178390097362944 x_squared=71133381496198443654882923674876045658950301908992 relative_rhs=7.9711945205981161e-17 backward_2_upper=3.8490294808621682e-17 target=pass elapsed_ns=93346780 attempt=5a8d2977d17c608cebb56d15b6d22fec29f631a909a69a1a0c18a91888d09329"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "2048",
+        "exponent": "1",
+        "rho": "39399178390097362944",
+        "x_squared": "71133381496198443654882923674876045658950301908992",
+        "relative_rhs": "7.9711945205981161e-17",
+        "backward_2_upper": "3.8490294808621682e-17",
+        "target": "pass",
+        "elapsed_ns": "93346780",
+        "attempt": "5a8d2977d17c608cebb56d15b6d22fec29f631a909a69a1a0c18a91888d09329"
+      },
+      "proof_bytes": 6988,
+      "peak_large_scratch_bytes": 65536,
+      "proof_sha256": "d1c5ce73c0a7641df48022b8f44b82af534a565e60eb601290d1db218f9e30ad",
+      "commit_prove_max_rss_kib": 6844,
+      "solve_commit_prove_max_rss_kib": 6844
+    },
+    {
+      "rows": 2048,
+      "trial": 3,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.031530192,
+          "peak_rss_kib": 6208
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.037771363,
+          "peak_rss_kib": 6460
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.009061370000000001,
+          "peak_rss_kib": 5892
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.041981050000000006,
+          "peak_rss_kib": 6220
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.03558546,
+          "peak_rss_kib": 6364
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.025739764000000002,
+          "peak_rss_kib": 6884
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.017018489,
+          "peak_rss_kib": 6452,
+          "stdout": "certified rows=2048 exponent=1 rho=39399178390097362944 x_squared=71133381496198443654882923674876045658950301908992 relative_rhs=7.9711945205981161e-17 backward_2_upper=3.8490294808621682e-17 target=pass elapsed_ns=117696533 attempt=5b9b5d55cbde61cee67e5af1e74df5206d579fe86f2eb586cffab070bc9770cb"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "2048",
+        "exponent": "1",
+        "rho": "39399178390097362944",
+        "x_squared": "71133381496198443654882923674876045658950301908992",
+        "relative_rhs": "7.9711945205981161e-17",
+        "backward_2_upper": "3.8490294808621682e-17",
+        "target": "pass",
+        "elapsed_ns": "117696533",
+        "attempt": "5b9b5d55cbde61cee67e5af1e74df5206d579fe86f2eb586cffab070bc9770cb"
+      },
+      "proof_bytes": 6988,
+      "peak_large_scratch_bytes": 65536,
+      "proof_sha256": "27e2a3025a137b4a49be8aee53881813e43efc8e358e37e1665a4e9d9b409a37",
+      "commit_prove_max_rss_kib": 6884,
+      "solve_commit_prove_max_rss_kib": 6884
+    },
+    {
+      "rows": 4096,
+      "trial": 1,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.031584047000000004,
+          "peak_rss_kib": 6308
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.03499892,
+          "peak_rss_kib": 6528
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.005266109000000001,
+          "peak_rss_kib": 6004
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.039349978,
+          "peak_rss_kib": 6256
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.032198237000000005,
+          "peak_rss_kib": 6288
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.035846984000000005,
+          "peak_rss_kib": 6724
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.024964975,
+          "peak_rss_kib": 6608,
+          "stdout": "certified rows=4096 exponent=1 rho=78810178729216573440 x_squared=142286497495272598091104985698375041121895189577728 relative_rhs=7.9717924488095046e-17 backward_2_upper=3.8490829427456003e-17 target=pass elapsed_ns=98101671 attempt=665959b449618e20d04ee792027180a248575ca5d9a6eb9c5f4cd738aa8af057"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "4096",
+        "exponent": "1",
+        "rho": "78810178729216573440",
+        "x_squared": "142286497495272598091104985698375041121895189577728",
+        "relative_rhs": "7.9717924488095046e-17",
+        "backward_2_upper": "3.8490829427456003e-17",
+        "target": "pass",
+        "elapsed_ns": "98101671",
+        "attempt": "665959b449618e20d04ee792027180a248575ca5d9a6eb9c5f4cd738aa8af057"
+      },
+      "proof_bytes": 8140,
+      "peak_large_scratch_bytes": 131072,
+      "proof_sha256": "6987d4bd9cc60b6c4c4ad8059581a63bde127fc93bf55a74e4f222421b8cfbb0",
+      "commit_prove_max_rss_kib": 6724,
+      "solve_commit_prove_max_rss_kib": 6724
+    },
+    {
+      "rows": 4096,
+      "trial": 2,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.029620308,
+          "peak_rss_kib": 6352
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.033287883000000004,
+          "peak_rss_kib": 6460
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.00540016,
+          "peak_rss_kib": 5880
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.066994146,
+          "peak_rss_kib": 6096
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.030470047000000004,
+          "peak_rss_kib": 6028
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.027313043000000002,
+          "peak_rss_kib": 6760
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.033970014,
+          "peak_rss_kib": 6580,
+          "stdout": "certified rows=4096 exponent=1 rho=78810178729216573440 x_squared=142286497495272598091104985698375041121895189577728 relative_rhs=7.9717924488095046e-17 backward_2_upper=3.8490829427456003e-17 target=pass elapsed_ns=126068304 attempt=f4c7a2c55e1ac8e02bce0afbf2f269d6f9775f12fec707825a9eaeb5f3318e32"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "4096",
+        "exponent": "1",
+        "rho": "78810178729216573440",
+        "x_squared": "142286497495272598091104985698375041121895189577728",
+        "relative_rhs": "7.9717924488095046e-17",
+        "backward_2_upper": "3.8490829427456003e-17",
+        "target": "pass",
+        "elapsed_ns": "126068304",
+        "attempt": "f4c7a2c55e1ac8e02bce0afbf2f269d6f9775f12fec707825a9eaeb5f3318e32"
+      },
+      "proof_bytes": 8140,
+      "peak_large_scratch_bytes": 131072,
+      "proof_sha256": "85d36cce1628f0e334dbdff48c4bad94d2a9454895ab212a9d4a08371f9fbca1",
+      "commit_prove_max_rss_kib": 6760,
+      "solve_commit_prove_max_rss_kib": 6760
+    },
+    {
+      "rows": 4096,
+      "trial": 3,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.026715302000000003,
+          "peak_rss_kib": 6196
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.027980092,
+          "peak_rss_kib": 6500
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.0032800620000000003,
+          "peak_rss_kib": 6012
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.030756654,
+          "peak_rss_kib": 6248
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.031920755,
+          "peak_rss_kib": 6396
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.028993453000000002,
+          "peak_rss_kib": 6428
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.018878501000000002,
+          "peak_rss_kib": 6628,
+          "stdout": "certified rows=4096 exponent=1 rho=78810178729216573440 x_squared=142286497495272598091104985698375041121895189577728 relative_rhs=7.9717924488095046e-17 backward_2_upper=3.8490829427456003e-17 target=pass elapsed_ns=77746487 attempt=51565019539a8c591b840fe833191d9e483d6d9763c41496e35b387e12ab9f35"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "4096",
+        "exponent": "1",
+        "rho": "78810178729216573440",
+        "x_squared": "142286497495272598091104985698375041121895189577728",
+        "relative_rhs": "7.9717924488095046e-17",
+        "backward_2_upper": "3.8490829427456003e-17",
+        "target": "pass",
+        "elapsed_ns": "77746487",
+        "attempt": "51565019539a8c591b840fe833191d9e483d6d9763c41496e35b387e12ab9f35"
+      },
+      "proof_bytes": 8140,
+      "peak_large_scratch_bytes": 131072,
+      "proof_sha256": "6bd2b27dd052b7e5641d57ccd60b01931cfac367cc872a29073340af0d5159f0",
+      "commit_prove_max_rss_kib": 6428,
+      "solve_commit_prove_max_rss_kib": 6428
+    },
+    {
+      "rows": 8192,
+      "trial": 1,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.033102862000000004,
+          "peak_rss_kib": 6208
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.033128637,
+          "peak_rss_kib": 6540
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.006483263,
+          "peak_rss_kib": 5956
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.048930017000000006,
+          "peak_rss_kib": 6196
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.033506451,
+          "peak_rss_kib": 6212
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.028951679,
+          "peak_rss_kib": 6648
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.034368948,
+          "peak_rss_kib": 6544,
+          "stdout": "certified rows=8192 exponent=1 rho=157632179407454994432 x_squared=284592729493420906963549109745373032047784964915200 relative_rhs=7.9720913960978673e-17 backward_2_upper=3.8491096616514271e-17 target=pass elapsed_ns=109956327 attempt=d0891ca00e0ac77e84699d6088a41d39ce1a3f79c8d58f1122a24228d9cecb1f"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "8192",
+        "exponent": "1",
+        "rho": "157632179407454994432",
+        "x_squared": "284592729493420906963549109745373032047784964915200",
+        "relative_rhs": "7.9720913960978673e-17",
+        "backward_2_upper": "3.8491096616514271e-17",
+        "target": "pass",
+        "elapsed_ns": "109956327",
+        "attempt": "d0891ca00e0ac77e84699d6088a41d39ce1a3f79c8d58f1122a24228d9cecb1f"
+      },
+      "proof_bytes": 10316,
+      "peak_large_scratch_bytes": 262144,
+      "proof_sha256": "0883f019acf9345b5e80b88b764f016025452579c65ba101f01ba515f0930a01",
+      "commit_prove_max_rss_kib": 6648,
+      "solve_commit_prove_max_rss_kib": 6648
+    },
+    {
+      "rows": 8192,
+      "trial": 2,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.029657865000000002,
+          "peak_rss_kib": 6348
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.031476629,
+          "peak_rss_kib": 6528
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.005119842,
+          "peak_rss_kib": 6112
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.040037237,
+          "peak_rss_kib": 6088
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.029993818000000002,
+          "peak_rss_kib": 6128
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.047881982000000003,
+          "peak_rss_kib": 6696
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.030400271000000003,
+          "peak_rss_kib": 6532,
+          "stdout": "certified rows=8192 exponent=1 rho=157632179407454994432 x_squared=284592729493420906963549109745373032047784964915200 relative_rhs=7.9720913960978673e-17 backward_2_upper=3.8491096616514271e-17 target=pass elapsed_ns=94631339 attempt=7c2ef349f3ac90d633cbbffc6dd773a5d925e91f2c5fb56cbbe7876e310c3562"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "8192",
+        "exponent": "1",
+        "rho": "157632179407454994432",
+        "x_squared": "284592729493420906963549109745373032047784964915200",
+        "relative_rhs": "7.9720913960978673e-17",
+        "backward_2_upper": "3.8491096616514271e-17",
+        "target": "pass",
+        "elapsed_ns": "94631339",
+        "attempt": "7c2ef349f3ac90d633cbbffc6dd773a5d925e91f2c5fb56cbbe7876e310c3562"
+      },
+      "proof_bytes": 10316,
+      "peak_large_scratch_bytes": 262144,
+      "proof_sha256": "dc8ba5f750b949651c577c434f7a8bbd453f6e92defc505044727bacccc1e6ed",
+      "commit_prove_max_rss_kib": 6696,
+      "solve_commit_prove_max_rss_kib": 6696
+    },
+    {
+      "rows": 8192,
+      "trial": 3,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.023768049000000003,
+          "peak_rss_kib": 6224
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.027806774000000003,
+          "peak_rss_kib": 6540
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.0053991130000000005,
+          "peak_rss_kib": 6164
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.048604296000000005,
+          "peak_rss_kib": 6260
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.026835761000000003,
+          "peak_rss_kib": 6420
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.040088214000000004,
+          "peak_rss_kib": 6696
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.024473925,
+          "peak_rss_kib": 6432,
+          "stdout": "certified rows=8192 exponent=1 rho=157632179407454994432 x_squared=284592729493420906963549109745373032047784964915200 relative_rhs=7.9720913960978673e-17 backward_2_upper=3.8491096616514271e-17 target=pass elapsed_ns=104324086 attempt=785c8ad1fff0dc9fa4f11c546f70111234bbde60412b9650db3e9136ce31d58d"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "8192",
+        "exponent": "1",
+        "rho": "157632179407454994432",
+        "x_squared": "284592729493420906963549109745373032047784964915200",
+        "relative_rhs": "7.9720913960978673e-17",
+        "backward_2_upper": "3.8491096616514271e-17",
+        "target": "pass",
+        "elapsed_ns": "104324086",
+        "attempt": "785c8ad1fff0dc9fa4f11c546f70111234bbde60412b9650db3e9136ce31d58d"
+      },
+      "proof_bytes": 10316,
+      "peak_large_scratch_bytes": 262144,
+      "proof_sha256": "fdb151dc48f5018faee5ef1f481f0618f292bd5de7c3e071a412a92248e1e44a",
+      "commit_prove_max_rss_kib": 6696,
+      "solve_commit_prove_max_rss_kib": 6696
+    },
+    {
+      "rows": 16384,
+      "trial": 1,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.025547866000000002,
+          "peak_rss_kib": 6288
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.029801547,
+          "peak_rss_kib": 6236
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.0046728410000000005,
+          "peak_rss_kib": 5892
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.045250663,
+          "peak_rss_kib": 6376
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.027068897,
+          "peak_rss_kib": 6272
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.05730379,
+          "peak_rss_kib": 6728
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.024132534,
+          "peak_rss_kib": 6592,
+          "stdout": "certified rows=16384 exponent=1 rho=315276180763931836416 x_squared=569205193489717524708437357839369013899564515590144 relative_rhs=7.9722408655382675e-17 backward_2_upper=3.8491230180959152e-17 target=pass elapsed_ns=93819492 attempt=97637e23b3a34b0b4116906a815dff79db9ce8d9730300c35cb468196082b6ca"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "16384",
+        "exponent": "1",
+        "rho": "315276180763931836416",
+        "x_squared": "569205193489717524708437357839369013899564515590144",
+        "relative_rhs": "7.9722408655382675e-17",
+        "backward_2_upper": "3.8491230180959152e-17",
+        "target": "pass",
+        "elapsed_ns": "93819492",
+        "attempt": "97637e23b3a34b0b4116906a815dff79db9ce8d9730300c35cb468196082b6ca"
+      },
+      "proof_bytes": 12492,
+      "peak_large_scratch_bytes": 524288,
+      "proof_sha256": "f361ddfde1ddf477b51764ce980573450bcf4c186d25a7ce99d3210a27992acf",
+      "commit_prove_max_rss_kib": 6728,
+      "solve_commit_prove_max_rss_kib": 6728
+    },
+    {
+      "rows": 16384,
+      "trial": 2,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.023598474,
+          "peak_rss_kib": 6316
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.027861972000000002,
+          "peak_rss_kib": 6536
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.0052946930000000005,
+          "peak_rss_kib": 6120
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.055171534,
+          "peak_rss_kib": 6272
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.026670350000000002,
+          "peak_rss_kib": 6108
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.055978115,
+          "peak_rss_kib": 6516
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.027523426,
+          "peak_rss_kib": 6464,
+          "stdout": "certified rows=16384 exponent=1 rho=315276180763931836416 x_squared=569205193489717524708437357839369013899564515590144 relative_rhs=7.9722408655382675e-17 backward_2_upper=3.8491230180959152e-17 target=pass elapsed_ns=108735925 attempt=b4ab1a63f7cb7bc3f80e6cc1be9e1e89c33e794c55e5a5c03f2cfd8dd3527678"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "16384",
+        "exponent": "1",
+        "rho": "315276180763931836416",
+        "x_squared": "569205193489717524708437357839369013899564515590144",
+        "relative_rhs": "7.9722408655382675e-17",
+        "backward_2_upper": "3.8491230180959152e-17",
+        "target": "pass",
+        "elapsed_ns": "108735925",
+        "attempt": "b4ab1a63f7cb7bc3f80e6cc1be9e1e89c33e794c55e5a5c03f2cfd8dd3527678"
+      },
+      "proof_bytes": 12492,
+      "peak_large_scratch_bytes": 524288,
+      "proof_sha256": "df4be601c7c1bb7b1d046318ab024e9c66e5681283cdd4c3c4d55593f93627d5",
+      "commit_prove_max_rss_kib": 6516,
+      "solve_commit_prove_max_rss_kib": 6516
+    },
+    {
+      "rows": 16384,
+      "trial": 3,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.022946868000000002,
+          "peak_rss_kib": 6180
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.028102535,
+          "peak_rss_kib": 6344
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.00559413,
+          "peak_rss_kib": 6120
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.043091514000000004,
+          "peak_rss_kib": 6140
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.027577375,
+          "peak_rss_kib": 6380
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.052095153000000005,
+          "peak_rss_kib": 6880
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.034560788,
+          "peak_rss_kib": 6452,
+          "stdout": "certified rows=16384 exponent=1 rho=315276180763931836416 x_squared=569205193489717524708437357839369013899564515590144 relative_rhs=7.9722408655382675e-17 backward_2_upper=3.8491230180959152e-17 target=pass elapsed_ns=97261830 attempt=00edc84f3e454d6a65678de584c6a26820702d8ce0b32dfb745d809a0f321441"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "16384",
+        "exponent": "1",
+        "rho": "315276180763931836416",
+        "x_squared": "569205193489717524708437357839369013899564515590144",
+        "relative_rhs": "7.9722408655382675e-17",
+        "backward_2_upper": "3.8491230180959152e-17",
+        "target": "pass",
+        "elapsed_ns": "97261830",
+        "attempt": "00edc84f3e454d6a65678de584c6a26820702d8ce0b32dfb745d809a0f321441"
+      },
+      "proof_bytes": 12492,
+      "peak_large_scratch_bytes": 524288,
+      "proof_sha256": "e748cc698916dd78399a14a68b14697926d22278decf7aec63dfca2f1c0c0f7d",
+      "commit_prove_max_rss_kib": 6880,
+      "solve_commit_prove_max_rss_kib": 6880
+    },
+    {
+      "rows": 32768,
+      "trial": 1,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.024739491000000002,
+          "peak_rss_kib": 6108
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.028527061000000003,
+          "peak_rss_kib": 6520
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.005929174000000001,
+          "peak_rss_kib": 6236
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.062504158,
+          "peak_rss_kib": 6284
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.024781286000000003,
+          "peak_rss_kib": 6220
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.08615201900000001,
+          "peak_rss_kib": 6740
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.048264491,
+          "peak_rss_kib": 6580,
+          "stdout": "certified rows=32768 exponent=1 rho=630564183476885520384 x_squared=1138430121482310760198213854027360977603123616940032 relative_rhs=7.9723155992075913e-17 backward_2_upper=3.8491296955661214e-17 target=pass elapsed_ns=112484962 attempt=05b5ccef98564d2c5f75683ada9fac206fd3fce2dd190dbd4f558a2191c67a8e"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "32768",
+        "exponent": "1",
+        "rho": "630564183476885520384",
+        "x_squared": "1138430121482310760198213854027360977603123616940032",
+        "relative_rhs": "7.9723155992075913e-17",
+        "backward_2_upper": "3.8491296955661214e-17",
+        "target": "pass",
+        "elapsed_ns": "112484962",
+        "attempt": "05b5ccef98564d2c5f75683ada9fac206fd3fce2dd190dbd4f558a2191c67a8e"
+      },
+      "proof_bytes": 16716,
+      "peak_large_scratch_bytes": 1048576,
+      "proof_sha256": "128f602d96d17d012a974c6848936ca59fff856b74150883166410b72d3158b5",
+      "commit_prove_max_rss_kib": 6740,
+      "solve_commit_prove_max_rss_kib": 6740
+    },
+    {
+      "rows": 32768,
+      "trial": 2,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.023869831,
+          "peak_rss_kib": 6336
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.037871394,
+          "peak_rss_kib": 6396
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.006554664,
+          "peak_rss_kib": 6304
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.06422263,
+          "peak_rss_kib": 6232
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.026021512,
+          "peak_rss_kib": 6372
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.07705780200000001,
+          "peak_rss_kib": 6716
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.043464927,
+          "peak_rss_kib": 6592,
+          "stdout": "certified rows=32768 exponent=1 rho=630564183476885520384 x_squared=1138430121482310760198213854027360977603123616940032 relative_rhs=7.9723155992075913e-17 backward_2_upper=3.8491296955661214e-17 target=pass elapsed_ns=125422130 attempt=077f911152e664700da157b17ff0233dddec85200bf76fb45ac6c9e7999d3b68"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "32768",
+        "exponent": "1",
+        "rho": "630564183476885520384",
+        "x_squared": "1138430121482310760198213854027360977603123616940032",
+        "relative_rhs": "7.9723155992075913e-17",
+        "backward_2_upper": "3.8491296955661214e-17",
+        "target": "pass",
+        "elapsed_ns": "125422130",
+        "attempt": "077f911152e664700da157b17ff0233dddec85200bf76fb45ac6c9e7999d3b68"
+      },
+      "proof_bytes": 16716,
+      "peak_large_scratch_bytes": 1048576,
+      "proof_sha256": "34919768ad8922cb76a459e5b08282ef2fa332dd559c8b7aa4a9e0d341fa75be",
+      "commit_prove_max_rss_kib": 6716,
+      "solve_commit_prove_max_rss_kib": 6716
+    },
+    {
+      "rows": 32768,
+      "trial": 3,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.023684083,
+          "peak_rss_kib": 6132
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.027276909000000002,
+          "peak_rss_kib": 6364
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.0068651350000000005,
+          "peak_rss_kib": 6356
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.068312568,
+          "peak_rss_kib": 6292
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.025695341,
+          "peak_rss_kib": 6264
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.080710972,
+          "peak_rss_kib": 6772
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.052391023,
+          "peak_rss_kib": 6408,
+          "stdout": "certified rows=32768 exponent=1 rho=630564183476885520384 x_squared=1138430121482310760198213854027360977603123616940032 relative_rhs=7.9723155992075913e-17 backward_2_upper=3.8491296955661214e-17 target=pass elapsed_ns=121297111 attempt=be3feded59bac3cfc695eb8782da2174499c9f277cbf7eb5d32ab76bdee7dbff"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "32768",
+        "exponent": "1",
+        "rho": "630564183476885520384",
+        "x_squared": "1138430121482310760198213854027360977603123616940032",
+        "relative_rhs": "7.9723155992075913e-17",
+        "backward_2_upper": "3.8491296955661214e-17",
+        "target": "pass",
+        "elapsed_ns": "121297111",
+        "attempt": "be3feded59bac3cfc695eb8782da2174499c9f277cbf7eb5d32ab76bdee7dbff"
+      },
+      "proof_bytes": 16716,
+      "peak_large_scratch_bytes": 1048576,
+      "proof_sha256": "46ed417c38a6e7dc6ddd165b931f9e4ee593a52725a7155e2f933fbde7de9da0",
+      "commit_prove_max_rss_kib": 6772,
+      "solve_commit_prove_max_rss_kib": 6772
+    },
+    {
+      "rows": 65536,
+      "trial": 1,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.024974171,
+          "peak_rss_kib": 6308
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.027806716000000002,
+          "peak_rss_kib": 6520
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.007669846,
+          "peak_rss_kib": 6900
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.100420198,
+          "peak_rss_kib": 6392
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.024725656000000002,
+          "peak_rss_kib": 6364
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.20895495500000003,
+          "peak_rss_kib": 6564
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.078772696,
+          "peak_rss_kib": 6712,
+          "stdout": "certified rows=65536 exponent=1 rho=1261140188902792888320 x_squared=2276879977467497231177766846403344905010241819639808 relative_rhs=7.9723529657795428e-17 backward_2_upper=3.8491330341132235e-17 target=pass elapsed_ns=155602841 attempt=0203b2263295cb4b4d10e21816785d13acf25645f62e4663ac2b24cc42b6a5e6"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "65536",
+        "exponent": "1",
+        "rho": "1261140188902792888320",
+        "x_squared": "2276879977467497231177766846403344905010241819639808",
+        "relative_rhs": "7.9723529657795428e-17",
+        "backward_2_upper": "3.8491330341132235e-17",
+        "target": "pass",
+        "elapsed_ns": "155602841",
+        "attempt": "0203b2263295cb4b4d10e21816785d13acf25645f62e4663ac2b24cc42b6a5e6"
+      },
+      "proof_bytes": 20940,
+      "peak_large_scratch_bytes": 2097152,
+      "proof_sha256": "012919606cee5425fe83bd616d867fa73f5e57433aae195f3872efeea05ed1a0",
+      "commit_prove_max_rss_kib": 6564,
+      "solve_commit_prove_max_rss_kib": 6900
+    },
+    {
+      "rows": 65536,
+      "trial": 2,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.024804906,
+          "peak_rss_kib": 6268
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.027106446000000003,
+          "peak_rss_kib": 6144
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.011351443000000001,
+          "peak_rss_kib": 6748
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.098920588,
+          "peak_rss_kib": 6184
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.027493031,
+          "peak_rss_kib": 6380
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.135778924,
+          "peak_rss_kib": 6572
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.07091554600000001,
+          "peak_rss_kib": 6440,
+          "stdout": "certified rows=65536 exponent=1 rho=1261140188902792888320 x_squared=2276879977467497231177766846403344905010241819639808 relative_rhs=7.9723529657795428e-17 backward_2_upper=3.8491330341132235e-17 target=pass elapsed_ns=167318769 attempt=2a8ab84256b367529406b72bf4b8caf8392a2cde72b6f12c7f6ccab3ef001dba"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "65536",
+        "exponent": "1",
+        "rho": "1261140188902792888320",
+        "x_squared": "2276879977467497231177766846403344905010241819639808",
+        "relative_rhs": "7.9723529657795428e-17",
+        "backward_2_upper": "3.8491330341132235e-17",
+        "target": "pass",
+        "elapsed_ns": "167318769",
+        "attempt": "2a8ab84256b367529406b72bf4b8caf8392a2cde72b6f12c7f6ccab3ef001dba"
+      },
+      "proof_bytes": 20940,
+      "peak_large_scratch_bytes": 2097152,
+      "proof_sha256": "59447ad948be00daec18155c19f52fc68cb33aaf805118ff94b2e57b72bf89fd",
+      "commit_prove_max_rss_kib": 6572,
+      "solve_commit_prove_max_rss_kib": 6748
+    },
+    {
+      "rows": 65536,
+      "trial": 3,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.023739357000000003,
+          "peak_rss_kib": 6300
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.028980846,
+          "peak_rss_kib": 6500
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.008609552000000001,
+          "peak_rss_kib": 6648
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.10413981900000001,
+          "peak_rss_kib": 6380
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.025251311000000002,
+          "peak_rss_kib": 6372
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.142446514,
+          "peak_rss_kib": 6756
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.073592875,
+          "peak_rss_kib": 6544,
+          "stdout": "certified rows=65536 exponent=1 rho=1261140188902792888320 x_squared=2276879977467497231177766846403344905010241819639808 relative_rhs=7.9723529657795428e-17 backward_2_upper=3.8491330341132235e-17 target=pass elapsed_ns=167250111 attempt=191a55ada5fe11736c93cbf142b05db35649296b8047323b7f0f181c0a81f1b6"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "65536",
+        "exponent": "1",
+        "rho": "1261140188902792888320",
+        "x_squared": "2276879977467497231177766846403344905010241819639808",
+        "relative_rhs": "7.9723529657795428e-17",
+        "backward_2_upper": "3.8491330341132235e-17",
+        "target": "pass",
+        "elapsed_ns": "167250111",
+        "attempt": "191a55ada5fe11736c93cbf142b05db35649296b8047323b7f0f181c0a81f1b6"
+      },
+      "proof_bytes": 20940,
+      "peak_large_scratch_bytes": 2097152,
+      "proof_sha256": "63cd40ae4ad6213733db418659e364a206142561fbea8f7d67cc4617c1d23ac6",
+      "commit_prove_max_rss_kib": 6756,
+      "solve_commit_prove_max_rss_kib": 6756
+    },
+    {
+      "rows": 131072,
+      "trial": 1,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.024158158000000002,
+          "peak_rss_kib": 6268
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.024422475000000003,
+          "peak_rss_kib": 6516
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.005444480000000001,
+          "peak_rss_kib": 7720
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.182248126,
+          "peak_rss_kib": 6384
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.024989483,
+          "peak_rss_kib": 6412
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.24456011300000002,
+          "peak_rss_kib": 6800
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.138072993,
+          "peak_rss_kib": 6432,
+          "stdout": "certified rows=131072 exponent=1 rho=2522292199754607624192 x_squared=4553779689437870173136872831155312759824478225039360 relative_rhs=7.972371648999842e-17 backward_2_upper=3.8491347033397754e-17 target=pass elapsed_ns=223788830 attempt=d6f0454145fd5ae07b60d6c77de39d01e7b80688358d91b2f34d178931ecdc84"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "131072",
+        "exponent": "1",
+        "rho": "2522292199754607624192",
+        "x_squared": "4553779689437870173136872831155312759824478225039360",
+        "relative_rhs": "7.972371648999842e-17",
+        "backward_2_upper": "3.8491347033397754e-17",
+        "target": "pass",
+        "elapsed_ns": "223788830",
+        "attempt": "d6f0454145fd5ae07b60d6c77de39d01e7b80688358d91b2f34d178931ecdc84"
+      },
+      "proof_bytes": 29260,
+      "peak_large_scratch_bytes": 4194304,
+      "proof_sha256": "981ebe6f579ca11d3dd44b8ea2dda66c482ef553177657779bcf641dd78769e1",
+      "commit_prove_max_rss_kib": 6800,
+      "solve_commit_prove_max_rss_kib": 7720
+    },
+    {
+      "rows": 131072,
+      "trial": 2,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.023462514,
+          "peak_rss_kib": 6344
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.026488207000000003,
+          "peak_rss_kib": 6400
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.005581718,
+          "peak_rss_kib": 7920
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.20249824800000002,
+          "peak_rss_kib": 6416
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.026358299,
+          "peak_rss_kib": 6208
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.24593351400000002,
+          "peak_rss_kib": 6800
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.128746774,
+          "peak_rss_kib": 6740,
+          "stdout": "certified rows=131072 exponent=1 rho=2522292199754607624192 x_squared=4553779689437870173136872831155312759824478225039360 relative_rhs=7.972371648999842e-17 backward_2_upper=3.8491347033397754e-17 target=pass elapsed_ns=247053921 attempt=e4dac9e0560e11abdbceddd104d5166d88393180d873f61e401cd66e1921542a"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "131072",
+        "exponent": "1",
+        "rho": "2522292199754607624192",
+        "x_squared": "4553779689437870173136872831155312759824478225039360",
+        "relative_rhs": "7.972371648999842e-17",
+        "backward_2_upper": "3.8491347033397754e-17",
+        "target": "pass",
+        "elapsed_ns": "247053921",
+        "attempt": "e4dac9e0560e11abdbceddd104d5166d88393180d873f61e401cd66e1921542a"
+      },
+      "proof_bytes": 29260,
+      "peak_large_scratch_bytes": 4194304,
+      "proof_sha256": "c1c2a8dd5a381277ad0c5fc9a637dde68fb4893117bd482df00cdc9352868b3d",
+      "commit_prove_max_rss_kib": 6800,
+      "solve_commit_prove_max_rss_kib": 7920
+    },
+    {
+      "rows": 131072,
+      "trial": 3,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.024573644000000002,
+          "peak_rss_kib": 6288
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.026719644,
+          "peak_rss_kib": 6396
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.007252419,
+          "peak_rss_kib": 7944
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.21284971900000002,
+          "peak_rss_kib": 6316
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.027401624000000003,
+          "peak_rss_kib": 6372
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.254644578,
+          "peak_rss_kib": 6684
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.133705708,
+          "peak_rss_kib": 6704,
+          "stdout": "certified rows=131072 exponent=1 rho=2522292199754607624192 x_squared=4553779689437870173136872831155312759824478225039360 relative_rhs=7.972371648999842e-17 backward_2_upper=3.8491347033397754e-17 target=pass elapsed_ns=263918882 attempt=f1d6799cbdb2facca04a666e6703b683ce13771de76cf63a34eb468b93d6a5d4"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "131072",
+        "exponent": "1",
+        "rho": "2522292199754607624192",
+        "x_squared": "4553779689437870173136872831155312759824478225039360",
+        "relative_rhs": "7.972371648999842e-17",
+        "backward_2_upper": "3.8491347033397754e-17",
+        "target": "pass",
+        "elapsed_ns": "263918882",
+        "attempt": "f1d6799cbdb2facca04a666e6703b683ce13771de76cf63a34eb468b93d6a5d4"
+      },
+      "proof_bytes": 29260,
+      "peak_large_scratch_bytes": 4194304,
+      "proof_sha256": "9b7dbc75df7d7977b56e08a33e68c11c1e8ffce0ad3a752477affb0999cd196f",
+      "commit_prove_max_rss_kib": 6684,
+      "solve_commit_prove_max_rss_kib": 7944
+    },
+    {
+      "rows": 262144,
+      "trial": 1,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.024286913,
+          "peak_rss_kib": 6328
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.025778765000000002,
+          "peak_rss_kib": 6448
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.016443238000000002,
+          "peak_rss_kib": 9660
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.302338612,
+          "peak_rss_kib": 6300
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.026835989,
+          "peak_rss_kib": 6284
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.46307962100000005,
+          "peak_rss_kib": 6684
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.23776903800000002,
+          "peak_rss_kib": 6664,
+          "stdout": "certified rows=262144 exponent=1 rho=5044596221458237095936 x_squared=9107579113378616057055084800659248469452951035838464 relative_rhs=7.9723809905935725e-17 backward_2_upper=3.8491355379413017e-17 target=pass elapsed_ns=370800922 attempt=c76858143c37292b417ca662fbfb0e26a62d8c77951faab54268e5422328800b"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "262144",
+        "exponent": "1",
+        "rho": "5044596221458237095936",
+        "x_squared": "9107579113378616057055084800659248469452951035838464",
+        "relative_rhs": "7.9723809905935725e-17",
+        "backward_2_upper": "3.8491355379413017e-17",
+        "target": "pass",
+        "elapsed_ns": "370800922",
+        "attempt": "c76858143c37292b417ca662fbfb0e26a62d8c77951faab54268e5422328800b"
+      },
+      "proof_bytes": 37580,
+      "peak_large_scratch_bytes": 8388608,
+      "proof_sha256": "2bead6113998d88676a02db48bca62ec40a16fa2dd79f96a9eaf7522034b6026",
+      "commit_prove_max_rss_kib": 6684,
+      "solve_commit_prove_max_rss_kib": 9660
+    },
+    {
+      "rows": 262144,
+      "trial": 2,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.028076222,
+          "peak_rss_kib": 6348
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.023943411,
+          "peak_rss_kib": 6196
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.016091243,
+          "peak_rss_kib": 9976
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.296629464,
+          "peak_rss_kib": 6212
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.026366983,
+          "peak_rss_kib": 6232
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.45170132900000004,
+          "peak_rss_kib": 6732
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.254559133,
+          "peak_rss_kib": 6452,
+          "stdout": "certified rows=262144 exponent=1 rho=5044596221458237095936 x_squared=9107579113378616057055084800659248469452951035838464 relative_rhs=7.9723809905935725e-17 backward_2_upper=3.8491355379413017e-17 target=pass elapsed_ns=360823369 attempt=9426315324af473254f84a8ff58032500de77e26bd2521c2370e2a6d0ec6aee7"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "262144",
+        "exponent": "1",
+        "rho": "5044596221458237095936",
+        "x_squared": "9107579113378616057055084800659248469452951035838464",
+        "relative_rhs": "7.9723809905935725e-17",
+        "backward_2_upper": "3.8491355379413017e-17",
+        "target": "pass",
+        "elapsed_ns": "360823369",
+        "attempt": "9426315324af473254f84a8ff58032500de77e26bd2521c2370e2a6d0ec6aee7"
+      },
+      "proof_bytes": 37580,
+      "peak_large_scratch_bytes": 8388608,
+      "proof_sha256": "6946b7612894951e1043d95dfa3cde61dfa0d1a5fcd0862d3d560dc8fb1ba9b8",
+      "commit_prove_max_rss_kib": 6732,
+      "solve_commit_prove_max_rss_kib": 9976
+    },
+    {
+      "rows": 262144,
+      "trial": 3,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.023937151,
+          "peak_rss_kib": 6144
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.024475404000000003,
+          "peak_rss_kib": 6492
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.015126736000000002,
+          "peak_rss_kib": 9944
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.34754521800000004,
+          "peak_rss_kib": 6356
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.025669843,
+          "peak_rss_kib": 6360
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.450355618,
+          "peak_rss_kib": 6656
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.22046093500000002,
+          "peak_rss_kib": 6468,
+          "stdout": "certified rows=262144 exponent=1 rho=5044596221458237095936 x_squared=9107579113378616057055084800659248469452951035838464 relative_rhs=7.9723809905935725e-17 backward_2_upper=3.8491355379413017e-17 target=pass elapsed_ns=402790555 attempt=6391dae1f09ce7c0e8ad6c3ee8e6b24660cd06bc2b53245542b12cd5946773b1"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "262144",
+        "exponent": "1",
+        "rho": "5044596221458237095936",
+        "x_squared": "9107579113378616057055084800659248469452951035838464",
+        "relative_rhs": "7.9723809905935725e-17",
+        "backward_2_upper": "3.8491355379413017e-17",
+        "target": "pass",
+        "elapsed_ns": "402790555",
+        "attempt": "6391dae1f09ce7c0e8ad6c3ee8e6b24660cd06bc2b53245542b12cd5946773b1"
+      },
+      "proof_bytes": 37580,
+      "peak_large_scratch_bytes": 8388608,
+      "proof_sha256": "70d25e888563aef9c087f908d06c75fa349fdfe6c6b7fd15da44c8182a796e3b",
+      "commit_prove_max_rss_kib": 6656,
+      "solve_commit_prove_max_rss_kib": 9944
+    },
+    {
+      "rows": 524288,
+      "trial": 1,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.024433532,
+          "peak_rss_kib": 6300
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.027074590000000003,
+          "peak_rss_kib": 6312
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.025067606000000003,
+          "peak_rss_kib": 13924
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.566772599,
+          "peak_rss_kib": 6180
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.030445694000000002,
+          "peak_rss_kib": 6020
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.866614121,
+          "peak_rss_kib": 6556
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.39655885500000004,
+          "peak_rss_kib": 6704,
+          "stdout": "certified rows=524288 exponent=1 rho=10089204264865496039424 x_squared=18215177961260107824891508739667119888709896657436672 relative_rhs=7.9723856613863331e-17 backward_2_upper=3.8491359552391275e-17 target=pass elapsed_ns=644564988 attempt=2fe9e7beb9eb9727e5b5d8068e78e910ff2905e0f0c398b0fe73f5b9fbbb5711"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "524288",
+        "exponent": "1",
+        "rho": "10089204264865496039424",
+        "x_squared": "18215177961260107824891508739667119888709896657436672",
+        "relative_rhs": "7.9723856613863331e-17",
+        "backward_2_upper": "3.8491359552391275e-17",
+        "target": "pass",
+        "elapsed_ns": "644564988",
+        "attempt": "2fe9e7beb9eb9727e5b5d8068e78e910ff2905e0f0c398b0fe73f5b9fbbb5711"
+      },
+      "proof_bytes": 54092,
+      "peak_large_scratch_bytes": 16777216,
+      "proof_sha256": "2dd91b57883c8645c02104a9b37c1087ebab5967fd2d82a46aa4ea14d9ef75fc",
+      "commit_prove_max_rss_kib": 6556,
+      "solve_commit_prove_max_rss_kib": 13924
+    },
+    {
+      "rows": 524288,
+      "trial": 2,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.023807093,
+          "peak_rss_kib": 6252
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.03204044,
+          "peak_rss_kib": 6540
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.023817624000000003,
+          "peak_rss_kib": 13796
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.5932359380000001,
+          "peak_rss_kib": 6040
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.028172993,
+          "peak_rss_kib": 6392
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.8666726440000001,
+          "peak_rss_kib": 6552
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.414421984,
+          "peak_rss_kib": 6668,
+          "stdout": "certified rows=524288 exponent=1 rho=10089204264865496039424 x_squared=18215177961260107824891508739667119888709896657436672 relative_rhs=7.9723856613863331e-17 backward_2_upper=3.8491359552391275e-17 target=pass elapsed_ns=670317846 attempt=d4c86b68e2732cd1d0691f88cda58ee063221fcb9131908dfc02993e756b6efe"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "524288",
+        "exponent": "1",
+        "rho": "10089204264865496039424",
+        "x_squared": "18215177961260107824891508739667119888709896657436672",
+        "relative_rhs": "7.9723856613863331e-17",
+        "backward_2_upper": "3.8491359552391275e-17",
+        "target": "pass",
+        "elapsed_ns": "670317846",
+        "attempt": "d4c86b68e2732cd1d0691f88cda58ee063221fcb9131908dfc02993e756b6efe"
+      },
+      "proof_bytes": 54092,
+      "peak_large_scratch_bytes": 16777216,
+      "proof_sha256": "4659d3fda4427e0fab8d2ac616ac596b22f13543c6fbbdb01489fe22f1ed581d",
+      "commit_prove_max_rss_kib": 6552,
+      "solve_commit_prove_max_rss_kib": 13796
+    },
+    {
+      "rows": 524288,
+      "trial": 3,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.023508275000000002,
+          "peak_rss_kib": 6156
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.023613792,
+          "peak_rss_kib": 6280
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.013907754000000001,
+          "peak_rss_kib": 13812
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.605735482,
+          "peak_rss_kib": 6288
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.025645872,
+          "peak_rss_kib": 6412
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.8800283210000001,
+          "peak_rss_kib": 6676
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.41457945700000004,
+          "peak_rss_kib": 6684,
+          "stdout": "certified rows=524288 exponent=1 rho=10089204264865496039424 x_squared=18215177961260107824891508739667119888709896657436672 relative_rhs=7.9723856613863331e-17 backward_2_upper=3.8491359552391275e-17 target=pass elapsed_ns=661245933 attempt=001ac2aefae681893df943c46eea4b15cd2a4d14a975b56cd3315398b842b489"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "524288",
+        "exponent": "1",
+        "rho": "10089204264865496039424",
+        "x_squared": "18215177961260107824891508739667119888709896657436672",
+        "relative_rhs": "7.9723856613863331e-17",
+        "backward_2_upper": "3.8491359552391275e-17",
+        "target": "pass",
+        "elapsed_ns": "661245933",
+        "attempt": "001ac2aefae681893df943c46eea4b15cd2a4d14a975b56cd3315398b842b489"
+      },
+      "proof_bytes": 54092,
+      "peak_large_scratch_bytes": 16777216,
+      "proof_sha256": "fe8696278cad6ff9ccfcee7c758d8378f064e4f44946a85bf4adfc6c5e2f4274",
+      "commit_prove_max_rss_kib": 6676,
+      "solve_commit_prove_max_rss_kib": 13812
+    },
+    {
+      "rows": 1048576,
+      "trial": 1,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.02277527,
+          "peak_rss_kib": 6084
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.02786316,
+          "peak_rss_kib": 6364
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.033527692000000005,
+          "peak_rss_kib": 22076
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.850429666,
+          "peak_rss_kib": 6328
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.025520610000000003,
+          "peak_rss_kib": 6400
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 1.61826631,
+          "peak_rss_kib": 6736
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.8119568030000001,
+          "peak_rss_kib": 6640,
+          "stdout": "certified rows=1048576 exponent=1 rho=20178420351680013926400 x_squared=36430375657023091360564356617682862727223787900633088 relative_rhs=7.9723879967816872e-17 backward_2_upper=3.849136163887306e-17 target=pass elapsed_ns=932548286 attempt=b12bbb957badf88468f502642dbc38272cd6d9ed3c54706f9e84e1d5af31a3ad"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "1048576",
+        "exponent": "1",
+        "rho": "20178420351680013926400",
+        "x_squared": "36430375657023091360564356617682862727223787900633088",
+        "relative_rhs": "7.9723879967816872e-17",
+        "backward_2_upper": "3.849136163887306e-17",
+        "target": "pass",
+        "elapsed_ns": "932548286",
+        "attempt": "b12bbb957badf88468f502642dbc38272cd6d9ed3c54706f9e84e1d5af31a3ad"
+      },
+      "proof_bytes": 70604,
+      "peak_large_scratch_bytes": 33554432,
+      "proof_sha256": "9c0a2af8cdb42cbbfd60e533f087caf568c1f1a2f9e247640a8eee6f34525cdb",
+      "commit_prove_max_rss_kib": 6736,
+      "solve_commit_prove_max_rss_kib": 22076
+    },
+    {
+      "rows": 1048576,
+      "trial": 2,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.025558855000000002,
+          "peak_rss_kib": 6300
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.027271417000000003,
+          "peak_rss_kib": 6176
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.035361308,
+          "peak_rss_kib": 22124
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.9055418660000001,
+          "peak_rss_kib": 6476
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.029292913,
+          "peak_rss_kib": 6412
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 1.7145919170000001,
+          "peak_rss_kib": 7008
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.777356648,
+          "peak_rss_kib": 6452,
+          "stdout": "certified rows=1048576 exponent=1 rho=20178420351680013926400 x_squared=36430375657023091360564356617682862727223787900633088 relative_rhs=7.9723879967816872e-17 backward_2_upper=3.849136163887306e-17 target=pass elapsed_ns=995136019 attempt=72254584130fa801fcad4d24046e348de67020c6f06cb154c6f16dc651638de1"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "1048576",
+        "exponent": "1",
+        "rho": "20178420351680013926400",
+        "x_squared": "36430375657023091360564356617682862727223787900633088",
+        "relative_rhs": "7.9723879967816872e-17",
+        "backward_2_upper": "3.849136163887306e-17",
+        "target": "pass",
+        "elapsed_ns": "995136019",
+        "attempt": "72254584130fa801fcad4d24046e348de67020c6f06cb154c6f16dc651638de1"
+      },
+      "proof_bytes": 70604,
+      "peak_large_scratch_bytes": 33554432,
+      "proof_sha256": "98597ba594ec069ffaf63084ae93ec57c5b4b82f6450d63b5d1c87914e2b85ca",
+      "commit_prove_max_rss_kib": 7008,
+      "solve_commit_prove_max_rss_kib": 22124
+    },
+    {
+      "rows": 1048576,
+      "trial": 3,
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.024172642,
+          "peak_rss_kib": 6168
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.029601228,
+          "peak_rss_kib": 6496
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.035695451,
+          "peak_rss_kib": 22148
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.9349195610000001,
+          "peak_rss_kib": 6368
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.024275758,
+          "peak_rss_kib": 6200
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 2.068916428,
+          "peak_rss_kib": 6820
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.828185524,
+          "peak_rss_kib": 6580,
+          "stdout": "certified rows=1048576 exponent=1 rho=20178420351680013926400 x_squared=36430375657023091360564356617682862727223787900633088 relative_rhs=7.9723879967816872e-17 backward_2_upper=3.849136163887306e-17 target=pass elapsed_ns=1021178743 attempt=b7176907206c73c91122053bacd50a7d25869c6b8b79726d0cb5895db859c3d2"
+        }
+      },
+      "status": "complete",
+      "verified": {
+        "rows": "1048576",
+        "exponent": "1",
+        "rho": "20178420351680013926400",
+        "x_squared": "36430375657023091360564356617682862727223787900633088",
+        "relative_rhs": "7.9723879967816872e-17",
+        "backward_2_upper": "3.849136163887306e-17",
+        "target": "pass",
+        "elapsed_ns": "1021178743",
+        "attempt": "b7176907206c73c91122053bacd50a7d25869c6b8b79726d0cb5895db859c3d2"
+      },
+      "proof_bytes": 70604,
+      "peak_large_scratch_bytes": 33554432,
+      "proof_sha256": "54e21a528f546d7f52abf6394dab197dbe6137ee6169e9412acade008eb3df5d",
+      "commit_prove_max_rss_kib": 6820,
+      "solve_commit_prove_max_rss_kib": 22148
+    }
+  ],
+  "oracle_by_rows": {
+    "1024": {
+      "checked_coordinates": 1024,
+      "july_q64_sha256": "37431c2dc1bab46a4fa0cfb18b2c7e7dfaa46e97f1445255964ed9ba295ca321",
+      "c_binary64_sha256": "61d3be0b77838eba20515b883d7bba8331f0984221ea34c9c1ac8e468aafe179",
+      "july_rho": "293458673664",
+      "july_squared_residual_denominator_exponent": 136,
+      "exponent": 1,
+      "new_rho": "19693678220537757696",
+      "new_x_squared": "35556823496661366436771892663126547927477858074624",
+      "relative_rhs": 7.969998529601357e-17,
+      "backward_2_upper": 3.848922460773162e-17
+    },
+    "2048": {
+      "checked_coordinates": 2048,
+      "july_q64_sha256": "87029d1dbe6ae1b24e622c21313d3d20620f944fea0d43075233c8e8d096dabb",
+      "c_binary64_sha256": "9dcf461541557f88b960b2814aca4e00d071f83a6bdeff842acd8e1bda0b9839",
+      "july_rho": "587093508096",
+      "july_squared_residual_denominator_exponent": 136,
+      "exponent": 1,
+      "new_rho": "39399178390097362944",
+      "new_x_squared": "71133381496198443654882923674876045658950301908992",
+      "relative_rhs": 7.971194520598117e-17,
+      "backward_2_upper": 3.849029480862169e-17
+    },
+    "4096": {
+      "checked_coordinates": 4096,
+      "july_q64_sha256": "d6beb02a7f7359c7d8006fdd4abf8a51ec5622ad4cda12a5aea42e2fd599203e",
+      "c_binary64_sha256": "1166571a357a95a0ffb47c1423c7e5c50572cd2ac545c9415fe3e16dc0b9e672",
+      "july_rho": "1174363176960",
+      "july_squared_residual_denominator_exponent": 136,
+      "exponent": 1,
+      "new_rho": "78810178729216573440",
+      "new_x_squared": "142286497495272598091104985698375041121895189577728",
+      "relative_rhs": 7.971792448809504e-17,
+      "backward_2_upper": 3.8490829427456e-17
+    },
+    "8192": {
+      "checked_coordinates": 8192,
+      "july_q64_sha256": "f593ff787741dbc9bb8da34d38de6705491395aba168c1d1c78d182232b3f400",
+      "c_binary64_sha256": "49293438ccddaf1273a21cedf1233a54afdc9e1c45d545535a922860fd5e1c96",
+      "july_rho": "2348902514688",
+      "july_squared_residual_denominator_exponent": 136,
+      "exponent": 1,
+      "new_rho": "157632179407454994432",
+      "new_x_squared": "284592729493420906963549109745373032047784964915200",
+      "relative_rhs": 7.972091396097868e-17,
+      "backward_2_upper": 3.849109661651427e-17
+    },
+    "16384": {
+      "checked_coordinates": 16384,
+      "july_q64_sha256": "1c2190892c8377a492741101c8a689a86968e9c542c7e8c449793237c3155605",
+      "c_binary64_sha256": "9f90c206635b5bb40b296492d75b5e39fa6b96f10311eac8b21b3252224bd8e0",
+      "july_rho": "4697981190144",
+      "july_squared_residual_denominator_exponent": 136,
+      "exponent": 1,
+      "new_rho": "315276180763931836416",
+      "new_x_squared": "569205193489717524708437357839369013899564515590144",
+      "relative_rhs": 7.972240865538267e-17,
+      "backward_2_upper": 3.8491230180959156e-17
+    },
+    "32768": {
+      "checked_coordinates": 32768,
+      "july_q64_sha256": "e74cac89afad8a0c14d30cb677fd5421100b3722322a90e429c0ba7827f4907e",
+      "c_binary64_sha256": "95a6645f6d4c4d9ba41cd62f3e3c8723ab08520e05c24fc6f0d5b03c1d695d73",
+      "july_rho": "9396138541056",
+      "july_squared_residual_denominator_exponent": 136,
+      "exponent": 1,
+      "new_rho": "630564183476885520384",
+      "new_x_squared": "1138430121482310760198213854027360977603123616940032",
+      "relative_rhs": 7.972315599207591e-17,
+      "backward_2_upper": 3.849129695566122e-17
+    },
+    "65536": {
+      "checked_coordinates": 65536,
+      "july_q64_sha256": "80598649b624dca4ad41a46537d7b8219b14b1fe6c0a27e7bf8013a90bbc28df",
+      "c_binary64_sha256": "b3ca17c487456d3d43decc0c6e0ec6d8e4460a6f3b595c4a2acd0b9bca4f7beb",
+      "july_rho": "18792453242880",
+      "july_squared_residual_denominator_exponent": 136,
+      "exponent": 1,
+      "new_rho": "1261140188902792888320",
+      "new_x_squared": "2276879977467497231177766846403344905010241819639808",
+      "relative_rhs": 7.972352965779543e-17,
+      "backward_2_upper": 3.8491330341132235e-17
+    },
+    "131072": {
+      "checked_coordinates": 131072,
+      "july_q64_sha256": "3a6cacd12c32e3dfe1a97386ac41780ea12a44d9df7a22aa1db6262e147525a9",
+      "c_binary64_sha256": "0209f6a2bfdd28ed06dd7ac633d250c648140e1421a258845457e57ad09366d8",
+      "july_rho": "37585082646528",
+      "july_squared_residual_denominator_exponent": 136,
+      "exponent": 1,
+      "new_rho": "2522292199754607624192",
+      "new_x_squared": "4553779689437870173136872831155312759824478225039360",
+      "relative_rhs": 7.972371648999842e-17,
+      "backward_2_upper": 3.849134703339776e-17
+    },
+    "262144": {
+      "checked_coordinates": 262144,
+      "july_q64_sha256": "4caa12d2efe0dd846175f5b75629174797e6a80888977f13d20bb57f5c53532a",
+      "c_binary64_sha256": "2adcf14fedd195e3654264dce5421992f64d9ff462c00e2d1cfdfc45ccccd433",
+      "july_rho": "75170341453824",
+      "july_squared_residual_denominator_exponent": 136,
+      "exponent": 1,
+      "new_rho": "5044596221458237095936",
+      "new_x_squared": "9107579113378616057055084800659248469452951035838464",
+      "relative_rhs": 7.972380990593572e-17,
+      "backward_2_upper": 3.849135537941301e-17
+    },
+    "524288": {
+      "checked_coordinates": 524288,
+      "july_q64_sha256": "0a41cd8dbb3106cb3b428aeb0f6e5b3f29e4bbc9bd4ef6b3db22b57e44d0f53f",
+      "c_binary64_sha256": "f1ecf8af99c1d4861eeb33ba80feaece1131d0cbe27c0e3a807a54be42be19d6",
+      "july_rho": "150340859068416",
+      "july_squared_residual_denominator_exponent": 136,
+      "exponent": 1,
+      "new_rho": "10089204264865496039424",
+      "new_x_squared": "18215177961260107824891508739667119888709896657436672",
+      "relative_rhs": 7.972385661386333e-17,
+      "backward_2_upper": 3.849135955239128e-17
+    },
+    "1048576": {
+      "checked_coordinates": 1048576,
+      "july_q64_sha256": "b1cb52cd6107ba8a76f0fae7745255e9deaece51ea8c5ca51daba3df446fe8fa",
+      "c_binary64_sha256": "5b8ccc28aa57052dd40da758a62afcc4cbcb3656e2dc3853918cc13a94c29cb7",
+      "july_rho": "300681894297600",
+      "july_squared_residual_denominator_exponent": 136,
+      "exponent": 1,
+      "new_rho": "20178420351680013926400",
+      "new_x_squared": "36430375657023091360564356617682862727223787900633088",
+      "relative_rhs": 7.972387996781687e-17,
+      "backward_2_upper": 3.849136163887306e-17
+    }
+  },
+  "july_exporter_sha256": "7d269a00ed3a55c3f008292c0d2988a4de178c5dfcfc37cabc5a24f4d4151d31",
+  "compared_whir_proof_rows": [
+    32768,
+    262144,
+    1048576
+  ]
+}

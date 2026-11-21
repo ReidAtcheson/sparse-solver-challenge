@@ -1,0 +1,27 @@
+*.o
+*.d
+/stencil
+/tests/check-commit
+/tests/check-generator
+__pycache__/
+/stencil-direct3d
+/libstencil.so
+/.stencil-blst-config
+/tests/check-drand
+/tests/check-tsa-clock
+/tests/check-three-band-rng
+/tests/check-three-band-c
+
+# Local attempts and issuer state. Archived public proof.bin fixtures stay tracked.
+/run/
+/runs/
+/demo-public/
+*.f64
+*.key
+*.pem
+*.start.*
+*.stamp.*
+**/issuer/secret
+**/authority/key
+**/private/
+**/ledger/

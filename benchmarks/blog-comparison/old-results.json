@@ -1,0 +1,261 @@
+{
+  "upstream_git_commit": "be8b67b74da54d162df2e6e0a9d813779959bb60",
+  "build": "existing release binaries selected with upstream --skip-build",
+  "binaries_sha256": {
+    "sparse-prover": "80b418a64aebe7725d06acd9bbb2c3750309d82e39eb4178e6afdc3e43a6c5ba",
+    "sparse-validator": "d901926d688835c0a5b382c49716784cdfe76c545f044d922dd00fe6a32b7522"
+  },
+  "pinned_toolchain": "rustc 1.94.0-nightly (86a49fd71 2026-01-14)",
+  "cpu": "13th Gen Intel(R) Core(TM) i7-1360P",
+  "platform": "Linux-7.2.6-76070206-generic-x86_64-with-glibc2.39",
+  "threads": 8,
+  "measurement": "GNU time %M in KiB and %e in seconds, per process",
+  "challenge_nonce": "9f36a2c4d7815be0084d63a912f7c5b34e1860dafb295c73a6418ed02bc9574f",
+  "published_fast_artifacts_on_disk": [
+    {
+      "rows": 1024,
+      "proof_bytes": 64036,
+      "precommitment_bytes": 204,
+      "bytes_including_precommitment": 64240,
+      "proof_sha256": "a8cb43e9e3057347d7eab6fe06def9a42d8ebfee539028e2d30c2b06df7a14e0"
+    },
+    {
+      "rows": 2048,
+      "proof_bytes": 86236,
+      "precommitment_bytes": 204,
+      "bytes_including_precommitment": 86440,
+      "proof_sha256": "4e719ccf364ea2317fc478680cefae93a7342b0eefaf5cc1a3e2b27a6e2a4d25"
+    },
+    {
+      "rows": 4096,
+      "proof_bytes": 117428,
+      "precommitment_bytes": 204,
+      "bytes_including_precommitment": 117632,
+      "proof_sha256": "a60b45185455d7dbcda387ea9b300228e8c56f680f4ef5d4bf54a9f4cabc4f6a"
+    },
+    {
+      "rows": 8192,
+      "proof_bytes": 146828,
+      "precommitment_bytes": 204,
+      "bytes_including_precommitment": 147032,
+      "proof_sha256": "d1c791d3e2fa27be5a694c6a6ea0e8d9946e525763584c38d25a42590988c8cb"
+    },
+    {
+      "rows": 16384,
+      "proof_bytes": 184612,
+      "precommitment_bytes": 204,
+      "bytes_including_precommitment": 184816,
+      "proof_sha256": "510d793dc581b0cf4393f707f7e24b6b288dabc3c6ff10996b1a5769c1d39b62"
+    },
+    {
+      "rows": 32768,
+      "proof_bytes": 219292,
+      "precommitment_bytes": 204,
+      "bytes_including_precommitment": 219496,
+      "proof_sha256": "edd2b553b5ae219e083dd315e8d5c14289b46d6a06e1df2907da765383a252e6"
+    },
+    {
+      "rows": 65536,
+      "proof_bytes": 265300,
+      "precommitment_bytes": 204,
+      "bytes_including_precommitment": 265504,
+      "proof_sha256": "fb0093893dd40fb1f98f0a63630cf5b2fd342755a3e97264052a498002f1fb63"
+    },
+    {
+      "rows": 131072,
+      "proof_bytes": 311500,
+      "precommitment_bytes": 204,
+      "bytes_including_precommitment": 311704,
+      "proof_sha256": "50e82f58c535bdc4c3440d3c28f9f7404d3e9215aeaf278654fff6bd5a78a844"
+    },
+    {
+      "rows": 262144,
+      "proof_bytes": 358212,
+      "precommitment_bytes": 204,
+      "bytes_including_precommitment": 358416,
+      "proof_sha256": "3c4e062c20b3ff8a892d45231d31cc07013dd15ed59244b135bb742540f437e3"
+    },
+    {
+      "rows": 524288,
+      "proof_bytes": 428316,
+      "precommitment_bytes": 204,
+      "bytes_including_precommitment": 428520,
+      "proof_sha256": "79db5a72f3426952fa47209b3576e8539323d6c2e452f9c62922bf8c61176147"
+    },
+    {
+      "rows": 1048576,
+      "proof_bytes": 478932,
+      "precommitment_bytes": 204,
+      "bytes_including_precommitment": 479136,
+      "proof_sha256": "e34e4598da194a7e3904d94c088dc7f1ae7d5eb14b3a8290c7ab9f0f172be95f"
+    }
+  ],
+  "exact": {
+    "started_utc": "2026-11-18T17:07:03Z",
+    "command": [
+      "scripts/run-cloud-benchmarks.sh",
+      "--threads",
+      "8",
+      "--dimensions",
+      "1048576,262144,32768",
+      "--skip-build",
+      "--output",
+      "/tmp/blog-rss-baseline-5MPqerap/exact"
+    ],
+    "runs": [
+      {
+        "rows": 32768,
+        "problem_digest": "5b8ee12a668b56a2a5ecd27f5374c6bc10a08cc5afeaec5eb442aa3f21779eb1",
+        "status": "verified",
+        "stages": {
+          "prover": {
+            "seconds": 6.97,
+            "max_rss_kib": 349744
+          },
+          "validator": {
+            "seconds": 0.01,
+            "max_rss_kib": 6920
+          }
+        },
+        "proof_bytes": 551670,
+        "proof_sha256": "d54b6a903ef7c9408294e18e77a0ce2e9499f1ee75996a1c8f78bd37c5a23b73",
+        "bytes_including_precommitment": 551670,
+        "residual_numerator": "9396138541056",
+        "residual_denominator_power": 136
+      },
+      {
+        "rows": 262144,
+        "problem_digest": "70c05f2bb4a07037b743614076cf8708fa0d5bd6b677eab2ffeba9dd95c06278",
+        "status": "verified",
+        "stages": {
+          "prover": {
+            "seconds": 57.05,
+            "max_rss_kib": 2342076
+          },
+          "validator": {
+            "seconds": 0.01,
+            "max_rss_kib": 7604
+          }
+        },
+        "proof_bytes": 716630,
+        "proof_sha256": "eb3a8ef6b4db097b110d2c097f3f055ce7bf75007f4ba6cde2be804224c9b945",
+        "bytes_including_precommitment": 716630,
+        "residual_numerator": "75170341453824",
+        "residual_denominator_power": 136
+      },
+      {
+        "rows": 1048576,
+        "problem_digest": "37232646d5799ec20ca36f018287166fbf8305eff79e251d24a956dfce2117dc",
+        "status": "verified",
+        "stages": {
+          "prover": {
+            "seconds": 225.59,
+            "max_rss_kib": 9351796
+          },
+          "validator": {
+            "seconds": 0.01,
+            "max_rss_kib": 7612
+          }
+        },
+        "proof_bytes": 779326,
+        "proof_sha256": "fe0e088e23080c96b5eba1704c5df8fac2c9f1a347c64ea65693b37b2bb6652e",
+        "bytes_including_precommitment": 779326,
+        "residual_numerator": "300681894297600",
+        "residual_denominator_power": 136
+      }
+    ]
+  },
+  "fast": {
+    "started_utc": "2026-11-18T17:12:05Z",
+    "command": [
+      "scripts/run-fast-benchmarks.sh",
+      "--threads",
+      "8",
+      "--dimensions",
+      "1048576,262144,32768",
+      "--skip-build",
+      "--output",
+      "/tmp/blog-rss-baseline-5MPqerap/fast"
+    ],
+    "runs": [
+      {
+        "rows": 32768,
+        "problem_digest": "5b8ee12a668b56a2a5ecd27f5374c6bc10a08cc5afeaec5eb442aa3f21779eb1",
+        "status": "verified",
+        "stages": {
+          "commit": {
+            "seconds": 0.1,
+            "max_rss_kib": 7280
+          },
+          "prover": {
+            "seconds": 0.43,
+            "max_rss_kib": 11052
+          },
+          "validator": {
+            "seconds": 0.0,
+            "max_rss_kib": 4472
+          }
+        },
+        "proof_bytes": 224668,
+        "proof_sha256": "6598a7c5f8e001f39e7ee56629786b0cf1820a4a8f051aee0d9ca1ddeac32342",
+        "bytes_including_precommitment": 224872,
+        "precommitment_bytes": 204,
+        "precommitment_sha256": "e16d59dbc2580d3c38d801ef6a403dd4d69e4a690a5423636d4b3944e09abd4d",
+        "validation_nonce": "3538b11d639e058ba6f415f67750c1e2f3a1284f3de6a23d69d27c0af52ab51f",
+        "residual_squared_l2": 1.538032246148e-28
+      },
+      {
+        "rows": 262144,
+        "problem_digest": "70c05f2bb4a07037b743614076cf8708fa0d5bd6b677eab2ffeba9dd95c06278",
+        "status": "verified",
+        "stages": {
+          "commit": {
+            "seconds": 0.82,
+            "max_rss_kib": 32240
+          },
+          "prover": {
+            "seconds": 3.6,
+            "max_rss_kib": 62840
+          },
+          "validator": {
+            "seconds": 0.0,
+            "max_rss_kib": 4792
+          }
+        },
+        "proof_bytes": 364036,
+        "proof_sha256": "a644ebf97480c45d7dfb8e9a1004486f6089e418b4946114d69adf9f41805a9d",
+        "bytes_including_precommitment": 364240,
+        "precommitment_bytes": 204,
+        "precommitment_sha256": "2a3d45c2e4769899d9cf01209d408f2622a131d01d1d7e04c349b505e806a255",
+        "validation_nonce": "7c4e657177823cdfe19efe8e32f15bd423c9ff8d5aa38c48218ac00a50aebd95",
+        "residual_squared_l2": 1.230598360241e-27
+      },
+      {
+        "rows": 1048576,
+        "problem_digest": "37232646d5799ec20ca36f018287166fbf8305eff79e251d24a956dfce2117dc",
+        "status": "verified",
+        "stages": {
+          "commit": {
+            "seconds": 3.42,
+            "max_rss_kib": 118072
+          },
+          "prover": {
+            "seconds": 14.29,
+            "max_rss_kib": 241120
+          },
+          "validator": {
+            "seconds": 0.0,
+            "max_rss_kib": 4828
+          }
+        },
+        "proof_bytes": 476020,
+        "proof_sha256": "9ec96c291a9d2d40b11b79faff29169697372dc8c4d69784979616d292c54e51",
+        "bytes_including_precommitment": 476224,
+        "precommitment_bytes": 204,
+        "precommitment_sha256": "554cc90450f6f97c60a4c66aa1d7819f9461dc0bd7bb961af0ff911ed46432ee",
+        "validation_nonce": "c572c481cff675ec86e1b4e511abafd97fa270aa8eb11f3c867e7466168b4500",
+        "residual_squared_l2": 4.922467396676e-27
+      }
+    ]
+  }
+}
