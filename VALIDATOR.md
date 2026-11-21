@@ -18,7 +18,7 @@ verify(proof, authority_key, expected_start = absent):
     if expected_start is present: require start == expected_start
     seed = SHA256("stencil-instance-seed-v1" || start)
     m = start.side
-    require m is a power of two in [1024, 65536]
+    require m is a power of two in [2^10, 2^30]
     L = log2(m); w = 2^floor(L/2); H = m/w
 
     # Fiat–Shamir. Digest a COPY of the running hash with a role byte and LE32 index.
@@ -103,13 +103,13 @@ The matrix-shaped commitment and its row folding follow the construction describ
 
     # The squared Frobenius norm divided by m is a lower bound on ||A||_2².
     # Cross-multiply the square-root comparison using arbitrary-precision integers.
-    a = (7*m - 12)*integer(Q)
+    a = k^2*(7*m - 12)*integer(Q)
     b = h^2*m^2
     d = 2^106*m*integer(rho) - a - b
     pass = (d <= 0) or (d^2 <= 4*a*b)
     relative_rhs = sqrt(rho)/(h*sqrt(m))
     lower_norm = sqrt((7*m - 12)/m)
-    backward_2_upper = sqrt(rho)/(lower_norm*sqrt(Q) + h*sqrt(m))
+    backward_2_upper = sqrt(rho)/(k*lower_norm*sqrt(Q) + h*sqrt(m))
     status = CERTIFIED_PASS if pass else CERTIFIED_MISS
     return status, rho, Q, relative_rhs, backward_2_upper, finish.time - start.time
 ```

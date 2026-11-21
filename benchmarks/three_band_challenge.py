@@ -80,8 +80,8 @@ def main():
     parser.add_argument("--public-dir", type=Path, help="new directory for public replays")
     args = parser.parse_args()
     if (args.trials < 1 or len(set(args.sizes)) != len(args.sizes)
-            or any(not 1024 <= n <= 65536 or n & (n - 1) for n in args.sizes)):
-        parser.error("use positive trials and distinct powers of two from 1024 to 65536")
+            or any(not 1024 <= n <= 1 << 30 or n & (n - 1) for n in args.sizes)):
+        parser.error("use positive trials and distinct powers of two from 1024 through 2^30")
     if args.output.exists() or (args.public_dir and args.public_dir.exists()):
         parser.error("choose new output paths")
     binary = args.binary.resolve(strict=True)

@@ -2,14 +2,40 @@
 
 #include <slu_ddefs.h>
 #include <math.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-int stencil_three_band_lu(int n, const uint32_t *offsets, const uint32_t *entries,
-                          const double *rhs, double *solution)
+_Static_assert(sizeof(int_t) == 4 || sizeof(int_t) == 8, "unsupported SuperLU index width");
+
+static int can_factor(uint64_t nnz)
 {
-    int_t nnz = offsets[n], info = 0;
+    const uint64_t limit = sizeof(int_t) == 8 ? INT64_MAX : INT32_MAX;
+    if (nnz > limit) {
+        fprintf(stderr, "SuperLU cannot index %" PRIu64 " input entries in this build. "
+                "Use a 64-bit-index SuperLU build or supply your own x.f64\n", nnz);
+        return 0;
+    }
+    /* dgstrf's initial dLUMemInit allocation converts this product to int_t. */
+    int fill_ratio = sp_ienv(6);
+    if (fill_ratio > 0 && nnz > limit / (unsigned)fill_ratio) {
+        fprintf(stderr, "SuperLU's %d-fold initial factor workspace for %" PRIu64
+                " entries exceeds its index range. Use a 64-bit-index SuperLU build "
+                "or supply your own x.f64\n", fill_ratio, nnz);
+        return 0;
+    }
+    return 1;
+}
+
+static int solve(int n, const uint64_t *offsets, const uint32_t *entries,
+                 const double *rhs, double *solution)
+{
+    if (offsets[n] > SIZE_MAX / sizeof(double)) {
+        fputs("SuperLU input exceeds the address range of this build\n", stderr);
+        return 0;
+    }
+    int_t nnz = (int_t)offsets[n], info = 0;
     int_t *column_starts = malloc(((size_t)n + 1) * sizeof(*column_starts));
     int_t *rows = malloc((size_t)nnz * sizeof(*rows));
     double *values = malloc((size_t)nnz * sizeof(*values));
@@ -22,7 +48,7 @@ int stencil_three_band_lu(int n, const uint32_t *offsets, const uint32_t *entrie
         goto cleanup;
     }
     /* CSR(A) is CSC(A) for this real symmetric input. */
-    for (int i = 0; i <= n; ++i) column_starts[i] = offsets[i];
+    for (int i = 0; i <= n; ++i) column_starts[i] = (int_t)offsets[i];
     for (int_t k = 0; k < nnz; ++k) {
         rows[k] = entries[k] >> 1;
         values[k] = (entries[k] & 1) ? -1.0 : 1.0;
@@ -46,7 +72,9 @@ int stencil_three_band_lu(int n, const uint32_t *offsets, const uint32_t *entrie
                 residual -= (long double)values[k] * solution[rows[k]];
             delta[i] = (double)residual;
         }
-        dgstrs(NOTRANS, &l, &u, perm_c, perm_r, &b, &stats, &info);
+        int refine_info = 0;  /* dgstrs uses int even with 64-bit sparse indices. */
+        dgstrs(NOTRANS, &l, &u, perm_c, perm_r, &b, &stats, &refine_info);
+        info = refine_info;
         if (!info)
             for (int i = 0; i < n; ++i) solution[i] += delta[i];
     }
@@ -63,3 +91,8 @@ cleanup:
     free(column_starts); free(rows); free(values); free(perm_c); free(perm_r); free(delta);
     return success;
 }
+
+const struct three_band_lu_backend stencil_three_band_lu_v2 = {
+    .can_factor = can_factor,
+    .solve = solve,
+};

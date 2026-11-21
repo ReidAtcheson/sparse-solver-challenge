@@ -11,7 +11,7 @@ COMMIT(start, pinned_authority_key, private_solution_file):
     verify the signed start with the pinned key                          # Ed25519, RFC 8032
     require profile "signed-three-band-backward80-v2"
     m = start.side                        # signed field stores number of unknowns
-    require m is a power of two in [1024, 65536]
+    require m is a power of two in [2^10, 2^30]
     L = log2(m)
     w = 2^floor(L/2)                      # commitment columns
     H = m / w                             # commitment rows, X[a*w + c]

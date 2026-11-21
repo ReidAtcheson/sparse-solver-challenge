@@ -3,6 +3,7 @@
 /stencil
 /tests/check-commit
 /tests/check-generator
+/tests/check-billion-storage
 __pycache__/
 /stencil-direct3d
 /libstencil.so

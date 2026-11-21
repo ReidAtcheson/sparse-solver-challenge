@@ -4,6 +4,7 @@ import ctypes as C
 import errno
 import hashlib
 import os
+import struct
 from pathlib import Path
 import subprocess
 import sys
@@ -43,6 +44,37 @@ def three_band_reference(binary, n, seed):
     key = mix(rhs_a ^ mix(rhs_b))
     return [(sorted(row), (1 if mix((key+i) & mask) >> 63 else -1) / n)
             for i, row in enumerate(rows)]
+
+
+def check_published_three_band(api):
+    # Known answers from the original bounded release (6610045), physical row order.
+    n = 4096
+    nnz = 7*n - 12
+    seed = (C.c_uint8 * 32)(*range(32))
+    handle = Handle()
+    checked(api.stencil_instance_from_seed(b"signed-three-band-backward80-v2", n, seed,
+                                           C.byref(handle)))
+    offsets = (C.c_uint64 * (n + 1))()
+    columns = (C.c_uint32 * nnz)()
+    values = (C.c_double * nnz)()
+    rhs = (C.c_double * n)()
+    try:
+        checked(api.stencil_rows(handle, 0, n, offsets, columns, values, nnz, rhs))
+    finally:
+        api.stencil_close(handle)
+    assert offsets[0] == 0 and offsets[n] == nnz
+    physical = bytes(offsets) + bytes(columns) + bytes(values)
+    assert hashlib.sha256(physical).hexdigest() == (
+        "4e7d72ff81cb55415c19848cc082c8b2e4f293bf73e7a45d04cfa90df7b21cd7")
+    assert hashlib.sha256(bytes(rhs)).hexdigest() == (
+        "d6b602cd679a28fee69e3f02a832de0dde513e0ecb27279c0ec23db243c8d714")
+    diagonal = bytearray()
+    for row in range(n):
+        for k in range(offsets[row], offsets[row + 1]):
+            if columns[k] == row:
+                diagonal.extend(struct.pack("<d", values[k]))
+    assert len(diagonal) == 8*n and hashlib.sha256(diagonal).hexdigest() == (
+        "b91eac4571384fb01eb1565560b63a6298c8dde017146a28f393dea76b6d32d1")
 
 
 def check_profile(work, api, binary, command, profile, side, dimensions):
@@ -120,6 +152,7 @@ if __name__ == "__main__":
     binary = ROOT / "stencil"
     library = Path(sys.argv[1]).resolve() if len(sys.argv) > 1 else ROOT / "libstencil.so"
     api = load(library)
+    check_published_three_band(api)
     with tempfile.TemporaryDirectory() as tmp:
         work = Path(tmp)
         subprocess.run([binary, "keygen", "sk", "pk"], check=True, cwd=work)
