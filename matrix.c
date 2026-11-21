@@ -32,9 +32,9 @@ static Matrix july_fixture(uint32_t side, const uint8_t seed[32])
 }
 
 static const MatrixProfile profiles[] = {
-    /* Sole active challenge. Keep the audited size and integer score envelope. */
-    {MATRIX_THREE_BAND_ID, "three-band", "start", 1, 1, MATRIX_ABS_ROW_LIMIT,
-     1024, MATRIX_ABS_ROW_LIMIT, 1, three_band},
+    /* The bounded graph has at most 1,203 predecessors, three choices and one diagonal. */
+    {MATRIX_THREE_BAND_ID, "three-band", "start", 1, 1, 1207,
+     1024, MATRIX_THREE_BAND_MAX_ROWS, 1, three_band},
     /* Preserve historical generators only for authenticated replay and tests. */
     {MATRIX_THREE_BAND_V1_ID, "three-band-v1", "startbandv1", 1, 1, MATRIX_ABS_ROW_LIMIT,
      1024, MATRIX_ABS_ROW_LIMIT, 1, three_band_v1},
@@ -136,7 +136,8 @@ int matrix_three_band_scan(const Matrix *a,
 }
 
 typedef struct {
-    uint32_t *upper, *counts;
+    uint32_t *upper;
+    uint64_t *counts;
     int8_t *diagonal;
     size_t used;
 } EdgeBuffer;
@@ -158,7 +159,8 @@ void matrix_release(Matrix *a)
 {
     free(a->offsets);
     free(a->entries);
-    a->offsets = a->entries = NULL;
+    a->offsets = NULL;
+    a->entries = NULL;
     a->max_row_terms = 0;
 }
 
@@ -167,9 +169,13 @@ int matrix_prepare(Matrix *a)
     if (!a) return EINVAL;
     if (a->dimensions != 1 || !a->signed_unit || a->offsets) return 0;
     size_t n = a->side;
-    if (n < 3 || n > MATRIX_ABS_ROW_LIMIT) return EINVAL;
+    uint32_t max_rows = a->legacy_three_band ? MATRIX_ABS_ROW_LIMIT : MATRIX_THREE_BAND_MAX_ROWS;
+    if (n < 3 || n > max_rows) return EINVAL;
+    uint64_t expected_nnz = matrix_three_band_nnz(a->side);
+    if (expected_nnz > SIZE_MAX / sizeof(*a->entries) ||
+        n + 1 > SIZE_MAX / sizeof(*a->offsets)) return EOVERFLOW;
     size_t upper_count = 3*n - 6;
-    uint32_t *offsets = calloc(n + 1, sizeof(*offsets));
+    uint64_t *offsets = calloc(n + 1, sizeof(*offsets));
     EdgeBuffer b = {.upper = malloc(upper_count * sizeof(*b.upper)),
                     .counts = offsets, .diagonal = malloc(n * sizeof(*b.diagonal))};
     uint32_t *entries = NULL;
@@ -181,12 +187,14 @@ int matrix_prepare(Matrix *a)
 
     /* Turn degree counts into exclusive ends. Fill each row backwards from
      * its end, leaving the offsets in their final CSR start positions. */
-    uint32_t nnz = 0, max_terms = 0;
+    uint64_t nnz = 0;
+    unsigned max_terms = 0;
     for (size_t i = 0; i < n; ++i) {
-        if (offsets[i] > max_terms) max_terms = offsets[i];
+        if (offsets[i] > max_terms) max_terms = (unsigned)offsets[i];
         nnz += offsets[i];
         offsets[i] = nnz;
     }
+    assert(nnz == expected_nnz);
     offsets[n] = nnz;
     entries = malloc((size_t)nnz * sizeof(*entries));
     if (!entries) { error = ENOMEM; goto done; }
@@ -372,7 +380,7 @@ int32_t matrix_visit(const Matrix *a, uint64_t i, MatrixTerm emit, void *context
 {
     if (a->dimensions == 1 && a->signed_unit) {
         assert(a->offsets && a->entries && i < a->side);
-        for (uint32_t k = a->offsets[i]; k < a->offsets[i + 1]; ++k) {
+        for (uint64_t k = a->offsets[i]; k < a->offsets[i + 1]; ++k) {
             uint32_t entry = a->entries[k];
             emit(context, entry >> 1, entry & 1 ? -1 : 1);
         }

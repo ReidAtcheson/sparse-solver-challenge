@@ -14,7 +14,8 @@ typedef struct {
     int legacy_three_band;       /* exact pre-cap stream for archived receipts */
     /* Optional indexed three-band representation. Entries encode
      * (column << 1) | (coefficient < 0) in sorted column order. */
-    uint32_t *offsets, *entries;
+    uint64_t *offsets;            /* 7*n - 12 may exceed UINT32_MAX */
+    uint32_t *entries;
     unsigned max_row_terms;
 } Matrix;
 
@@ -54,7 +55,15 @@ const MatrixProfile *matrix_profile_id(const char *id);
 const MatrixProfile *matrix_profile_command(const char *name, int local_start);
 const MatrixProfile *matrix_profile_kind(unsigned dimensions, int signed_unit);
 int matrix_profile_side(const MatrixProfile *profile, uint64_t side);
-enum { MATRIX_ABS_ROW_LIMIT = 65536 };
+enum {
+    MATRIX_ABS_ROW_LIMIT = 65536,
+    MATRIX_THREE_BAND_MAX_ROWS = 1U << 30
+};
+/* Both signed three-band generators emit exactly this many CSR entries. */
+static inline uint64_t matrix_three_band_nnz(uint32_t rows)
+{
+    return UINT64_C(7) * rows - 12;
+}
 /* Prepare arbitrary row access once, returning an errno value or zero. Other
  * profiles need no allocation. A prepared Matrix owns its arrays; do not copy
  * it. Releasing it also permits replaying from the same seeds. */

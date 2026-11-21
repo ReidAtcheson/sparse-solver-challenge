@@ -239,11 +239,21 @@ static int solve_three_band(Matrix *a, size_t n, const char *path)
                 dlerror());
         return 0;
     }
-    three_band_lu_fn *solve = (three_band_lu_fn *)dlsym(library, "stencil_three_band_lu");
+    const struct three_band_lu_backend *backend = dlsym(library, "stencil_three_band_lu_v2");
+    if (!backend) {
+        fputs("incompatible three-band solver plugin. Rebuild with make\n", stderr);
+        dlclose(library);
+        return 0;
+    }
+    uint64_t nnz = matrix_three_band_nnz(a->side);
+    if (!backend->can_factor(nnz)) {
+        dlclose(library);
+        return 0;
+    }
     struct timespec start, prepared, finished;
     int ok = 0;
     double *rhs = malloc(n * sizeof(*rhs)), *x = malloc(n * sizeof(*x));
-    if (!solve || !rhs || !x) {
+    if (!rhs || !x) {
         fputs("failed to initialize three-band solver\n", stderr);
         goto done;
     }
@@ -255,7 +265,7 @@ static int solve_three_band(Matrix *a, size_t n, const char *path)
     }
     for (size_t i = 0; i < n; ++i) rhs[i] = matrix_three_band_rhs(a, i) / (double)n;
     clock_gettime(CLOCK_MONOTONIC, &prepared);
-    ok = solve((int)n, a->offsets, a->entries, rhs, x);
+    ok = backend->solve((int)n, a->offsets, a->entries, rhs, x);
     clock_gettime(CLOCK_MONOTONIC, &finished);
     fprintf(stderr, "generation_seconds=%.9f solve_seconds=%.9f\n",
             elapsed_seconds(start, prepared), elapsed_seconds(prepared, finished));

@@ -34,7 +34,7 @@ unsigned stencil_max_row_terms(const stencil_instance *instance);
  * Provide count+1 offsets, count RHS doubles, and capacity entries for each
  * of columns and values. capacity >= count * max_row_terms always suffices.
  * Request rows in any order. Ignore all outputs if a call reports an error.
- * The three-band instance holds a packed 32-bit CSR. Calls to stencil_rows
+ * The three-band instance stores 64-bit row offsets and 32-bit packed entries. Calls to stencil_rows
  * on an open instance use constant additional working space. */
 int stencil_rows(const stencil_instance *instance, uint64_t first, size_t count,
                  uint64_t *offsets, uint32_t *columns, double *values,

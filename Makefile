@@ -57,17 +57,21 @@ tests/check-commit: tests/commit.c commit.c witness.c commit.h witness.h
 	$(CC) $(filter-out -MMD -MP,$(CFLAGS)) -DSTENCIL_CHECK_LIMBS $(LDFLAGS) tests/commit.c commit.c witness.c $(LDLIBS) -o $@
 tests/check-generator: tests/generator.c operator.o witness.o scratch.o
 	$(CC) $(filter-out -MMD -MP,$(CFLAGS)) -I. $(LDFLAGS) $^ $(LDLIBS) -o $@
+tests/check-billion-storage: tests/billion_storage.c matrix.o three_band.o three_band_rng.o
+	$(CC) $(filter-out -MMD -MP,$(CFLAGS)) -I. $(LDFLAGS) $^ -lm -o $@
 tests/check-drand: tests/drand.c drand.o $(BLST_LIB)
 	$(CC) $(filter-out -MMD -MP,$(CFLAGS)) $(DRAND_CPPFLAGS) $(LDFLAGS) $^ -lcrypto -o $@
 tests/check-tsa-clock: tests/tsa_clock.c
 	$(CC) $(filter-out -MMD -MP,$(CFLAGS)) $(LDFLAGS) $< -lcrypto -o $@
 
-check: all check-three-band tests/check-commit tests/check-generator tests/check-drand check-signed3d
+check: all check-three-band tests/check-commit tests/check-generator tests/check-billion-storage tests/check-drand check-signed3d
 	./tests/check-commit
 	./tests/check-generator
+	./tests/check-billion-storage
 	./tests/check-drand
 	python3 tests/check.py ./stencil
 	python3 tests/check_three_band_challenge.py
+	python3 tests/check_large_profile.py
 	python3 tests/check_rfc3161.py ./stencil
 	python3 tests/check_public_tsa.py
 	python3 tests/library.py
@@ -85,7 +89,7 @@ check-signed3d: stencil
 	python3 tests/signed_spectrum.py
 	python3 benchmarks/signed3d.py --sides 32 --regression --no-save
 clean:
-	$(RM) three_band_lu.o three_band_lu.d libstencil_superlu.so tests/check-three-band-rng tests/check-three-band-c stencil libstencil.so stencil-direct3d direct3d.o direct3d.d tests/check-commit tests/check-generator tests/check-drand tests/check-tsa-clock $(objects) $(objects:.o=.d) .stencil-blst-config
+	$(RM) tests/check-billion-storage three_band_lu.o three_band_lu.d libstencil_superlu.so tests/check-three-band-rng tests/check-three-band-c stencil libstencil.so stencil-direct3d direct3d.o direct3d.d tests/check-commit tests/check-generator tests/check-drand tests/check-tsa-clock $(objects) $(objects:.o=.d) .stencil-blst-config
 -include $(objects:.o=.d)
 .PHONY: all FORCE check check-three-band check-three-band-reference check-beacon check-signed3d clean
 

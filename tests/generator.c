@@ -1,5 +1,8 @@
 /* Links operator.c to an alternate public generator, without matrix.c. */
 #include "operator.h"
+#include "witness.h"
+
+#include <math.h>
 
 #include <limits.h>
 #include <stdio.h>
@@ -21,6 +24,12 @@ static unsigned column(unsigned row, unsigned k)
  * no symmetry. Each test row's absolute coefficient sum is at most 24. */
 int32_t matrix_visit(const Matrix *a, uint64_t row, MatrixTerm emit, void *context)
 {
+    if (a->dimensions == 1 && a->signed_unit) {
+        if (row) emit(context, row - 1, (row - 1) % 2 ? 1 : -1);
+        emit(context, row, -1);
+        if (row + 1 < a->side) emit(context, row + 1, row % 2 ? 1 : -1);
+        return matrix_three_band_rhs(a, row);
+    }
     for (unsigned k = 0; k < 7 + row % 3; ++k)
         emit(context, column((unsigned)row, k), coefficient[k]);
     /* This fixture uses horizontal_key solely to select malformed variants. */
@@ -69,6 +78,41 @@ static void equal_element(FILE *f, F expected)
     F got;
     require(fread(&got, sizeof(got), 1, f) == 1 && fcmp(got, expected) == 0,
             "wrong streamed element");
+}
+
+static F power_of_two(unsigned exponent)
+{
+    F value = fzero();
+    value.l[exponent / 64] = UINT64_C(1) << (exponent % 64);
+    return value;
+}
+
+/* Exercise the exact scaling selected at the maximum registered dimension,
+ * using a small tridiagonal operator so the regression needs no large files.
+ * For X = 2^78 e_0, AX has just two nonzeros, both -2^78, on opposite RHS
+ * signs. Their mixed terms cancel in rho = N h² + 2 (k 2^78)². */
+static void check_wide_residual(int exponent, int expected_shift)
+{
+    int shift;
+    require(witness_profile_shift(1, 1, 30, exponent, &shift) && shift == expected_shift,
+            "wrong endpoint exponent scaling");
+    unsigned k_bits = shift < 0 ? (unsigned)-shift : 0;
+    unsigned h_bits = shift > 0 ? (unsigned)shift : 0;
+    Matrix a = {.side = N, .dimensions = 1, .signed_unit = 1};
+    double y[N] = {0};
+    y[0] = ldexp(1.0, exponent);
+    FILE *xi = tmpfile();
+    require(xi && fwrite(y, sizeof(*y), N, xi) == N, "write wide witness");
+    F rho, q;
+    FILE *r = op_residual_wide(xi, &a, N, exponent, shift, &rho, &q);
+    __int128 kx = (__int128)1 << (78 + k_bits), h = (__int128)1 << h_bits;
+    for (unsigned i = 0; i < N; ++i) {
+        __int128 defect = (i < 2 ? -kx : 0) - h * matrix_three_band_rhs(&a, i);
+        equal_element(r, fwide(defect));
+    }
+    F expected = fadd(fmul(fsmall(N), power_of_two(2*h_bits)), power_of_two(157 + 2*k_bits));
+    require(!fcmp(rho, expected) && !fcmp(q, power_of_two(156)), "wrong wide energies");
+    require(!fclose(xi) && !fclose(r), "close");
 }
 
 int main(void)
@@ -135,6 +179,10 @@ int main(void)
     endpoint = op_endpoint(&symmetric, N, WIDTH, rowhi, rowlo, colhi, collo, &b, &rhs_energy);
     require(!fcmp(endpoint, ref) && !fcmp(b, ref_rhs) && rhs_energy == N,
             "symmetric scan differs from explicit rows");
+
+    check_wide_residual(-60, 108);
+    check_wide_residual(48, 0);
+    check_wide_residual(54, -6);
 
     a.horizontal_key = 4;
     (void)op_endpoint(&a, N, WIDTH, rowhi, rowlo, colhi, collo, &b, &rhs_energy);
