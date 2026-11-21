@@ -35,7 +35,7 @@ def mix(x):
 
 def check_stamp_stdio(directory, digest):
     entry = "authenticated-entrant"
-    invoke(directory, "start", "sk", SIDE, entry, "endpoint-start")
+    invoke(directory, "start2d", "sk", SIDE, entry, "endpoint-start")
     start = (directory / "endpoint-start").read_bytes()
     request = start + digest
 
@@ -99,11 +99,11 @@ def main(directory):
     verifier.mkdir()
     invoke(prover, "keygen", "sk", "pk")
     invoke(prover, "keygen", "other-sk", "other-pk")
-    invoke(prover, "start", "sk", SIDE, "test-entry", "start")
-    invoke(prover, "start", "sk", SIDE, "test-entry", "start-retry")
-    invoke(prover, "start", "sk", SIDE, "test-entry", "start")
+    invoke(prover, "start2d", "sk", SIDE, "test-entry", "start")
+    invoke(prover, "start2d", "sk", SIDE, "test-entry", "start-retry")
+    invoke(prover, "start2d", "sk", SIDE, "test-entry", "start")
     assert (prover/"start-retry").read_bytes() == (prover/"start").read_bytes()
-    invoke(prover, "start", "sk", SIDE, "other-test-entry", "other-start")
+    invoke(prover, "start2d", "sk", SIDE, "other-test-entry", "other-start")
     invoke(prover, "solve", "pk", "start", "x")
     solution = (prover / "x").read_bytes()
     assert len(solution) == 8 * SIDE**2

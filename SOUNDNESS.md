@@ -4,6 +4,8 @@ For the shared-exponent C proof, a classical random-oracle analysis bounds adapt
 
 The analysis below models the local Ed25519 issuer in versions 1 and 2. Version 3 pins a winning digest before a shared Quicknet round and authenticates time with RFC 3161. Its registrar and shared-beacon assumptions are specified separately. [External receipt security model](BEACON.md#wire-format-and-trust-inputs)
 
+The three-band challenge uses the same message order, challenge derivation and commitment opening. Its generator-specific bounds lift the two authenticated field energies to ordinary integers and give a conservative test for backward error. [Three-band integer bounds](THREE_BAND_PROOF.md)
+
 ## What counts as a forgery
 
 Fix a registered start and an independently pinned issuer key. Permit one freshly sampled finish receipt for the attempt and take probabilities over its unrevealed randomness. The adversary may choose the digest, use the genuine issuer, abort selectively, and make adaptive classical hash queries. It wins the numerical game if the verifier certifies a transcript, including a certified miss, and the energies disagree with those of the vector recovered from the prover's state at the digest request. Count an accepted proof for which extraction fails as a win too. A false pass is a special case. Substituting an unauthorized receipt is a separate authentication failure included in the overall bound below.

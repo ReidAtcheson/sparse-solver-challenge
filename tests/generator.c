@@ -35,6 +35,27 @@ int32_t matrix_visit(const Matrix *a, uint64_t row, MatrixTerm emit, void *conte
     return row % 17 == 0 ? 2 : row % 3 == 0 ? -1 : 1;
 }
 
+/* A second, symmetric fixture exercises a verifier that sees each upper
+ * edge just once and obtains the two public interpolation weights separately. */
+int matrix_three_band_scan(const Matrix *a, int (*emit)(void *, size_t, size_t, int), void *context)
+{
+    for (size_t i = 0; i + 1 < a->side; ++i) {
+        int error = emit(context, i, i + 1, i % 2 ? 1 : -1);
+        if (error) return error;
+    }
+    for (size_t i = 0; i < a->side; ++i) {
+        int error = emit(context, i, i, -1);
+        if (error) return error;
+    }
+    return 0;
+}
+
+int32_t matrix_three_band_rhs(const Matrix *a, uint64_t i)
+{
+    (void)a;
+    return i % 3 ? -1 : 1;
+}
+
 static void require(int condition, const char *message)
 {
     if (!condition) {
@@ -98,6 +119,22 @@ int main(void)
     require(fcmp(endpoint, fsmall(expected_endpoint)) == 0, "wrong matrix endpoint");
     require(rhs_energy == expected_rhs_energy, "wrong exact RHS norm");
     require(!fclose(input) && !fclose(residual) && !fclose(transpose), "close");
+
+    Matrix symmetric = {.dimensions = 1, .signed_unit = 1, .side = N};
+    F ref = fzero(), ref_rhs = fzero();
+    for (unsigned i = 0; i < N; ++i) {
+        F wi = fmul(rowhi[i/WIDTH], rowlo[i%WIDTH]);
+        F row = fzero();
+        for (unsigned j = i ? i-1 : 0; j <= i+1 && j < N; ++j) {
+            int sign = j == i ? -1 : (i < j ? i : j) % 2 ? 1 : -1;
+            row = fadd(row, fscale(fmul(colhi[j/WIDTH], collo[j%WIDTH]), sign));
+        }
+        ref = fadd(ref, fmul(wi, row));
+        ref_rhs = fadd(ref_rhs, fscale(wi, i % 3 ? -1 : 1));
+    }
+    endpoint = op_endpoint(&symmetric, N, WIDTH, rowhi, rowlo, colhi, collo, &b, &rhs_energy);
+    require(!fcmp(endpoint, ref) && !fcmp(b, ref_rhs) && rhs_energy == N,
+            "symmetric scan differs from explicit rows");
 
     a.horizontal_key = 4;
     (void)op_endpoint(&a, N, WIDTH, rowhi, rowlo, colhi, collo, &b, &rhs_energy);

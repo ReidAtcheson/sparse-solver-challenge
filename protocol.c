@@ -154,8 +154,7 @@ static void publish_bytes(const char *path, const void *p, size_t n)
     close_file(f);
 }
 
-/* Rectangular commitment tables accommodate an odd number of Boolean
- * variables in a 3D cube. Every physical row is used exactly once. */
+/* An odd number of Boolean variables gives a rectangular commitment table. */
 typedef struct {
     uint64_t n;
     unsigned bits;
@@ -347,7 +346,7 @@ static int wide_profile(const struct rc_info *info)
 static int rhs_shift(int exponent, unsigned bits, const struct rc_info *info)
 {
     int shift;
-    if (!witness_profile_shift(info->dimensions, bits, exponent, &shift))
+    if (!witness_profile_shift(info->dimensions, info->signed_unit, bits, exponent, &shift))
         die("shared exponent outside registered profile");
     return shift;
 }
@@ -404,30 +403,40 @@ static int report(const struct rc_info *info, F energy, __uint128_t rhs_squared)
     return pass ? 0 : 3;
 }
 
-/* In integer residual units the denominator is norm*k*sqrt(Q)+h*||B||.
- * A certified rational lower bound on norm gives a conservative test.
- * Clear its denominator before comparing the two radicals exactly. */
+/* In integer residual units the denominator is L*k*sqrt(Q)+h*||B||,
+ * where L <= ||A||_2 and L^2 is rational in every registered profile. */
 static int report_wide(const struct rc_info *info, F energy, F x_squared,
                        uint64_t n, __uint128_t rhs_squared, int exponent, int shift)
 {
-    int blog = info->dimensions == 1;
-    /* Rayleigh quotient of the all-ones vector for tridiag(1,8,1). */
-    BN_ULONG norm_num = blog ? (BN_ULONG)(10*n - 2) : 7;
-    BN_ULONG norm_den = blog ? (BN_ULONG)n : 1;
+    int blog = info->dimensions == 1 && !info->signed_unit;
+    int three_band = info->dimensions == 1 && info->signed_unit;
+    uint64_t numerator = 7, denominator = 1;
+    if (blog) {
+        /* L is the Rayleigh quotient of the tridiagonal at all ones. */
+        numerator = 10*n - 2;
+        denominator = n;
+    } else if (three_band) {
+        /* L^2 = ||A||_F^2 / n: 7*n-12 stored entries of magnitude one. */
+        numerator = 7*n - 12;
+        denominator = n;
+    }
     BN_CTX *ctx = BN_CTX_new();
     if (!ctx)
         die("cannot allocate score context");
     BN_CTX_start(ctx);
     BIGNUM *r = BN_CTX_get(ctx), *x = BN_CTX_get(ctx), *lhs = BN_CTX_get(ctx);
     BIGNUM *a = BN_CTX_get(ctx), *b = BN_CTX_get(ctx), *diff = BN_CTX_get(ctx);
-    BIGNUM *bound = BN_CTX_get(ctx);
+    BIGNUM *bound = BN_CTX_get(ctx), *num_sq = BN_CTX_get(ctx), *den_sq = BN_CTX_get(ctx);
     int k_bits = shift < 0 ? -shift : 0, h_bits = shift > 0 ? shift : 0;
-    if (!bound || !BN_lebin2bn((const unsigned char *)&energy, sizeof(energy), r) ||
+    if (!den_sq || !BN_lebin2bn((const unsigned char *)&numerator, sizeof(numerator), num_sq) ||
+        !BN_lebin2bn((const unsigned char *)&denominator, sizeof(denominator), den_sq) ||
+        (!three_band && (!BN_sqr(num_sq, num_sq, ctx) || !BN_sqr(den_sq, den_sq, ctx))) ||
+        !BN_lebin2bn((const unsigned char *)&energy, sizeof(energy), r) ||
         !BN_lebin2bn((const unsigned char *)&x_squared, sizeof(x_squared), x) ||
-        !BN_lshift(lhs, r, 106) || !BN_mul_word(lhs, norm_den) || !BN_mul_word(lhs, norm_den) ||
-        !BN_lshift(a, x, 2*k_bits) || !BN_mul_word(a, norm_num) || !BN_mul_word(a, norm_num) ||
+        !BN_lshift(lhs, r, 106) || !BN_mul(lhs, lhs, den_sq, ctx) ||
+        !BN_lshift(a, x, 2*k_bits) || !BN_mul(a, a, num_sq, ctx) ||
         !BN_lebin2bn((const unsigned char *)&rhs_squared, sizeof(rhs_squared), b) ||
-        !BN_lshift(b, b, 2*h_bits) || !BN_mul_word(b, norm_den) || !BN_mul_word(b, norm_den) ||
+        !BN_lshift(b, b, 2*h_bits) || !BN_mul(b, b, den_sq, ctx) ||
         !BN_sub(diff, lhs, a) || !BN_sub(diff, diff, b))
         die("integer score computation failed");
     int pass = BN_is_negative(diff) || BN_is_zero(diff);
@@ -442,10 +451,11 @@ static int report_wide(const struct rc_info *info, F energy, F x_squared,
     long double residual = sqrtl(strtold(rho, NULL));
     long double rhs = ldexpl(sqrtl((long double)rhs_squared), h_bits);
     long double sol = ldexpl(sqrtl(strtold(x2, NULL)), k_bits);
-    long double norm = (long double)norm_num / norm_den;
+    long double norm = (long double)numerator / denominator;
+    if (three_band) norm = sqrtl(norm);
     printf("certified rows=%" PRIu64 " exponent=%d rho=%s x_squared=%s relative_rhs=%.17Lg "
            "%s=%.17Lg target=%s elapsed_ns=%" PRIu64 " attempt=",
-           n, exponent, rho, x2, residual/rhs, blog ? "backward_2_upper" : "backward_2",
+           n, exponent, rho, x2, residual/rhs, blog || three_band ? "backward_2_upper" : "backward_2",
            residual/(norm*sol+rhs),
            pass ? "pass" : "miss", info->finish_ns - info->start_ns);
     for (size_t i = 0; i < sizeof(info->attempt); ++i)
@@ -581,6 +591,8 @@ static int run_proof(const ProofJob *job)
     FILE *xi = NULL, *residual = NULL;
     if (creating) {
         xi = open_file(job->solution, "rb");
+        int error = matrix_prepare(&matrix);
+        if (error) die(strerror(error));
         if (wide) {
             mask_sums_wide(xi, n, mask_seed, projections, exponent);
             residual = op_residual_wide(xi, &matrix, n, exponent, shift, &energy, &x_squared);
@@ -628,6 +640,7 @@ static int run_proof(const ProofJob *job)
     F partial = fadd(fadd(ru, projected), fmul(lambda, x_squared));
     if (creating) {
         FILE *transpose = op_transpose(&matrix, n, layout.width, u.hi, u.lo, &bval);
+        matrix_release(&matrix);
         Moment m = wide ? fold_product_prepare_wide(transpose, xi, n, mask_seed, coef,
                                                     exponent, lambda, matrix_factor)
                         : fold_product_prepare(transpose, xi, n, mask_seed, coef);
@@ -715,8 +728,8 @@ int main(int argc, char **argv)
                 .digest=argv[4], .proof=argv[5]});
     }
     fputs("usage: stencil COMMAND ARGS\n"
-          "  keygen SECRET PUBLIC\n  start SECRET SIDE ENTRY START\n  start3d SECRET CUBE_SIDE ENTRY START\n"
-          "  startsigned3d SECRET CUBE_SIDE ENTRY START\n"
+          "  keygen SECRET PUBLIC\n  start SECRET ROWS ENTRY START  (three-band challenge)\n"
+          "  start2d | start3d | startsigned3d SECRET SIDE ENTRY START  (test fixtures)\n"
           "  startblog SECRET ROWS ENTRY START  (fixed July comparison fixture)\n"
           "  solve PUBLIC START SOLUTION.f64\n  commit PUBLIC START SOLUTION.f64 ROWS DIGEST\n"
           "  stamp SECRET START DIGEST FINISH\n"

@@ -1,30 +1,30 @@
 # Sparse Solver Challenge
 
-Solve a public, seeded sparse system $Ax=b$ using any solver. Commit to your solution, get a timestamp on the commitment, and generate a non-interactive proof. Someone else can check your numerical result on their own machine from the proof and public challenge inputs. Your full solution stays with you.
+Solve a public, seeded **signed three-band** sparse system $Ax=b$ using any solver. Commit to your solution, get a timestamp on the commitment, and generate a non-interactive proof. Someone else can check your numerical result on their own machine from the proof and public challenge inputs. Your full solution stays with you.
 
 This repository contains the C reference prover and validator. There is currently no official submission endpoint or leaderboard. Keep a passing transcript for bragging rights, share a replay command, or agree on a challenge and clock with another team.
 
 ## Give this to a solver agent
 
-> Use my solver on the registered signed 3D challenge in https://github.com/ReidAtcheson/sparse-solver-challenge. Build the reference tool and replay its archived proof first. Start a fresh 32³ practice round. Feed the seeded matrix and RHS to my solver, commit its solution, obtain a receipt, and generate a proof. Replay the proof in a directory containing only the public bundle. Report the validator exit status, backward error, commitment time, receipt mode, and paths to the three public files. Label a run using your own issuer as self-timed.
+> Clone https://github.com/ReidAtcheson/sparse-solver-challenge, build the tool, and verify the archived proof. Start a fresh 4,096-row signed three-band round with `stencil start`. Feed the authenticated matrix and RHS to my solver, commit its solution, timestamp the digest, and generate a proof. Run the validator in a fresh directory containing only the public key, signed start and transcript. Return those three files, the validator exit status, `backward_2_upper`, proof size, and separate solve, prove and verify times and peak RSS. Label a run using your own issuer as self-timed.
 
 ## Build and verify a result
 
-On little-endian Linux, build with GNU Make, a C compiler supporting 128-bit integers, OpenSSL development headers and libsodium. On Debian or Ubuntu the build packages are `build-essential pkg-config libssl-dev libsodium-dev`. The default test suite also needs Python 3 and the OpenSSL command-line tool.
+On Debian or Ubuntu, install `build-essential pkg-config libssl-dev libsodium-dev libsuperlu-dev`. The included numerical solver uses SuperLU. Entrants supplying their own solution and machines dedicated to validation can omit SuperLU. The reference targets little-endian Linux. The test suite also uses Python 3 and the OpenSSL command-line tool.
 
 ```sh
 git clone https://github.com/ReidAtcheson/sparse-solver-challenge.git
 cd sparse-solver-challenge
 make
-fixture=benchmarks/signed3d-public/grid-32-trial-01
+fixture=benchmarks/three-band-cloud/public
 ./stencil verify "$fixture/authority.pub" "$fixture/proof.bin" "$fixture/start.receipt"
 ```
 
-That archived run has 32,768 unknowns and a 16,716-byte proof. Look for `target=pass` and `backward_2=1.7474050162894104e-17`. The validator regenerates the matrix and right-hand side from the authenticated start. Run `make check` to exercise the local round trip, altered submissions and known-answer vectors.
+That transcript is 16,716 bytes for 32,768 unknowns. Look for `rows=32768` and `target=pass`. The validator regenerates the signed matrix and RHS from the authenticated start. Run `make check` for regression and altered-proof tests. [Cloud timings, process memory and transcript sizes](benchmarks/THREE_BAND.md)
 
 ## Play a round
 
-The example uses the signed, indefinite $32^3$ profile. The accuracy target is joint 2-norm backward error at most $2^{-53}$ for the fixed-point vector actually committed. The validator checks the threshold with integer arithmetic. A faster time counts once the proof establishes a passing score.
+Each fresh seed draws a symmetric sparse matrix with $7n-12$ entries of magnitude one, including a signed diagonal. The three bands are centered at offsets $1$, $n^{1/3}$ and $n^{2/3}$. Random positions, tail draws and signs change across challenges. Each RHS entry is $+1/n$ or $-1/n$. The instance is issued as drawn, including a possible singular matrix. The registered row counts are powers of two from 1,024 through 65,536. [Generator and seed derivation](THREE_BAND.md)
 
 Run these commands in one shell from the repository root. This practice round creates its own receipt issuer.
 
@@ -36,7 +36,7 @@ mkdir "$run/issuer" "$run/private" "$run/public"
 cd "$run"
 
 "$tool" keygen issuer/secret public/authority.pub
-"$tool" startsigned3d issuer/secret 32 team-a public/start.receipt
+"$tool" start issuer/secret 4096 team-a public/start.receipt
 
 # Replace this command with your solver when making your own attempt.
 "$tool" solve public/authority.pub public/start.receipt private/x.f64
@@ -49,9 +49,9 @@ cd "$run"
 printf 'Replay bundle: %s/public\n' "$run"
 ```
 
-**Use your own solver.** Open the signed start with `stencil_instance_open` and request matrix rows and RHS entries with `stencil_rows`. Write `private/x.f64` as exactly one little-endian binary64 per unknown in original index order, without a header. The same `commit`, `prove` and `verify` commands then work. You can also commit a contiguous in-memory solution through `libstencil.so`. A working Python example solves the July tridiagonal fixture with generated rows and hands a private memory descriptor to the proof worker. [C API](stencil.h) · [Python example](examples/library_solve.py)
+**Use your own solver.** Open the signed start with `stencil_instance_open` and request matrix rows and RHS entries with `stencil_rows`. Write `private/x.f64` as exactly one little-endian binary64 per unknown in original index order, without a header. The same `commit`, `prove` and `verify` commands then work. You can also commit a contiguous in-memory solution through `libstencil.so`. The reference SuperLU solver performs fresh symbolic ordering, factorization and two refinement steps on each draw. [C API](stencil.h) · [SuperLU solver](three_band_lu.c)
 
-**Read the result.** `rho` is the exact integer squared residual in the profile's units. On the signed 3D profile, `backward_2` measures $\|Ax-b\|_2/(\|A\|_2\|x\|_2+\|b\|_2)$. The validator returns **0** for a verified pass, **3** for a verified score that missed the target, **1** for rejection or an operational error, and **2** for incorrect command syntax. The `elapsed_ns` field runs from challenge start to receipt of the **commitment digest**. Proof generation can finish later. [Score definitions and supported profiles](REFERENCE.md)
+**Read the result.** `rho` is the exact integer squared residual in the profile's units. The validator computes a certified upper bound on joint 2-norm backward error for the committed fixed-point vector. It uses $L=\sqrt{(7n-12)/n}\leq\|A\|_2$ in the denominator. Passing requires `backward_2_upper` at most $2^{-53}$, checked with integers. The validator returns **0** for a verified pass, **3** for a verified score that missed the target, **1** for rejection or an operational error, and **2** for incorrect command syntax. The `elapsed_ns` field runs from challenge start to receipt of the **commitment digest**. Proof generation can finish later. [Exact score and integer bounds](THREE_BAND_PROOF.md)
 
 ## Share a replayable claim
 
@@ -69,7 +69,7 @@ For a common public start, the external receipt mode uses a preregistered drand 
 
 ## Protocol and generators
 
-The reference verifies registered challenge families. These include seeded 2D and 3D diffusion, the signed 3D torus above, and a fixed July tridiagonal comparison. The experimental signed three-band generator is available for solver and ordering experiments. It still needs a registered RHS and scoring specification to support benchmark proofs. [Three-band generator](THREE_BAND.md)
+The authenticated profile ID is `signed-three-band-backward80-v1`. A public verifier streams the seeded edges and accumulates both symmetric contributions. Its generator uses a column-counter array linear in $n$ and takes quadratic time to replay the specified random draws. [Three-band generator](THREE_BAND.md) · [Proof specification](THREE_BAND_PROOF.md)
 
 Independent provers can target the published transcript format and test against known answers. The protocol is a research implementation with documented soundness and trust assumptions. [Prover](PROVER.md) · [Validator](VALIDATOR.md) · [Wire format and test vectors](INTEROP.md) · [Soundness analysis](SOUNDNESS.md)
 

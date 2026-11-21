@@ -116,13 +116,15 @@ static int wide_size(size_t n, int exponent)
     return 1;
 }
 
-int witness_profile_shift(unsigned dimensions, unsigned bits, int exponent, int *shift)
+int witness_profile_shift(unsigned dimensions, int signed_unit, unsigned bits, int exponent,
+                          int *shift)
 {
-    if (dimensions == 1) {
+    if (dimensions == 1 && !signed_unit) {
         if (exponent < -26 || exponent > 54) return 0;
         *shift = 74 - exponent;
     } else {
-        if (dimensions != 3 || bits > 30 || exponent < -(int)bits - 30 || exponent > 54)
+        if (!signed_unit || (dimensions != 1 && dimensions != 3) ||
+            bits > 30 || exponent < -(int)bits - 30 || exponent > 54)
             return 0;
         *shift = 78 - exponent - (int)bits;
     }

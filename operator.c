@@ -183,7 +183,7 @@ static FILE *make_residual(FILE *xi, const Matrix *a, uint64_t n, const int *exp
     for (uint64_t i = 0; i < n; ++i) {
         ResidualRow r = { .limit = {n, MATRIX_ABS_ROW_LIMIT}, .cache = &c };
         int32_t rhs = matrix_visit(a, i, residual_term, &r);
-        if (exponent && a->dimensions == 1) {
+        if (exponent && a->dimensions == 1 && !a->signed_unit) {
             if (rhs < -207 || rhs > 207) bad_size();
         } else if (exponent && rhs != 1 && rhs != -1) bad_size();
         __int128 residual = ax_multiplier * r.sum - rhs_multiplier * rhs;
@@ -295,10 +295,51 @@ static void endpoint_term(void *context, uint64_t j, int coefficient)
     r->dot = fadd(r->dot, fscale(r->weights[slot][index], coefficient));
 }
 
+typedef struct {
+    uint32_t mask;
+    unsigned shift;
+    const F *rowhi, *rowlo, *colhi, *collo;
+    F result;
+} SymmetricEndpoint;
+
+/* Accumulate the bilinear form directly from the signed upper triangle.
+ * Both terms of an off-diagonal pair use the same sign. */
+static int symmetric_entry(void *context, size_t i, size_t j, int sign)
+{
+    SymmetricEndpoint *e = context;
+    F ri = fmul(e->rowhi[i >> e->shift], e->rowlo[i & e->mask]);
+    F cj = fmul(e->colhi[j >> e->shift], e->collo[j & e->mask]);
+    F term = fmul(ri, cj);
+    if (i != j) {
+        F rj = fmul(e->rowhi[j >> e->shift], e->rowlo[j & e->mask]);
+        F ci = fmul(e->colhi[i >> e->shift], e->collo[i & e->mask]);
+        term = fadd(term, fmul(rj, ci));
+    }
+    e->result = sign == 1 ? fadd(e->result, term) : fsub(e->result, term);
+    return 0;
+}
+
 F op_endpoint(const Matrix *a, uint64_t n, uint32_t width, const F *rowhi, const F *rowlo,
               const F *colhi, const F *collo, F *bval, __uint128_t *rhs_squared)
 {
     unsigned shift = layout_shift(a, n, width);
+    if (a->dimensions == 1 && a->signed_unit) {
+        SymmetricEndpoint e = {.mask = width - 1, .shift = shift, .rowhi = rowhi, .rowlo = rowlo,
+                               .colhi = colhi, .collo = collo, .result = fzero()};
+        int error = matrix_three_band_scan(a, symmetric_entry, &e);
+        if (error) {
+            errno = error;
+            io_error("regenerate three-band matrix");
+        }
+        F b = fzero();
+        for (uint64_t i = 0; i < n; ++i) {
+            F wi = fmul(rowhi[i >> shift], rowlo[i & (width - 1)]);
+            b = fadd(b, fscale(wi, matrix_three_band_rhs(a, i)));
+        }
+        *bval = b;
+        *rhs_squared = n;  /* every unscaled RHS code is +1 or -1 */
+        return e.result;
+    }
     EndpointRow r = {.limit = {n, 0}, .mask = width - 1, .shift = shift,
                      .hi = colhi, .lo = collo};
     _Static_assert(F_PER_PAGE == 128, "endpoint page bitmap width");

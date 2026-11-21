@@ -115,13 +115,14 @@ def residual_oracle(side, seed, solution):
     return energy
 
 
-def measure(helper, command, directory, env, result, name, checkpoint, cap=0):
+def measure(helper, command, directory, env, result, name, checkpoint, cap=0, discard_stdout=False):
     result["active_stage"] = name
     checkpoint()
     print(f"  {name}", flush=True)
     before = oom_counts()
     run = subprocess.run([helper, str(cap), *command], cwd=directory, env=env,
-                         text=True, errors="replace", capture_output=True)
+                         text=True, errors="replace", stderr=subprocess.PIPE,
+                         stdout=subprocess.DEVNULL if discard_stdout else subprocess.PIPE)
     after = oom_counts()
     match = re.search(r"^MEASURE (\d+) (\d+)\n?\Z", run.stderr, re.M)
     stats = {"exit_status": run.returncode}
@@ -131,7 +132,7 @@ def measure(helper, command, directory, env, result, name, checkpoint, cap=0):
     diagnostic = run.stderr[:match.start()] if match else run.stderr
     if diagnostic.strip():
         stats["stderr"] = diagnostic.strip()[-4096:]
-    if run.stdout.strip():
+    if run.stdout and run.stdout.strip():
         stats["stdout"] = run.stdout.strip()[-4096:]
     increments = {k: v-before[k] for k, v in after.items() if k in before and v != before[k]}
     if increments:
@@ -140,7 +141,7 @@ def measure(helper, command, directory, env, result, name, checkpoint, cap=0):
     checkpoint()
     if run.returncode != 0 or not match:
         raise RuntimeError(f"{name} exited {run.returncode}. {diagnostic.strip()[-500:]}")
-    return run.stdout.strip()
+    return (run.stdout or "").strip()
 
 
 def run_trial(args, helper, case, env, work, checkpoint, oracle):

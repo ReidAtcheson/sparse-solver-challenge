@@ -405,7 +405,8 @@ int receipt_main(int argc, char **argv)
         if (!ok) fprintf(stderr, "%s failed\n", argv[0]);
         return ok ? 0 : 1;
     }
-    fprintf(stderr, "commands:\n  keygen SECRET PUBLIC\n  start SECRET SIDE ENTRY START\n"
+    fprintf(stderr, "commands:\n  keygen SECRET PUBLIC\n  start SECRET N ENTRY START\n"
+                    "  start2d SECRET SIDE ENTRY START\n"
                     "  start3d SECRET CUBE_SIDE ENTRY START\n"
                     "  startsigned3d SECRET CUBE_SIDE ENTRY START\n"
                     "  startblog SECRET ROWS ENTRY START\n"

@@ -141,22 +141,22 @@ int bc_check_evidence(const char *registration, const char *ca, const char *poli
            check_stamp(ca, policy, start, digest, der, der_len, info, uncertainty_ns);
 }
 
-static int registration(char **a)
+/* args starts at the dimension; the profile is selected before parsing. */
+static int registration(const MatrixProfile *p, char **args)
 {
     uint8_t reg[BC_REG_BYTES] = {0};
     uint64_t side, first, last, err;
-    const MatrixProfile *p = matrix_profile_command(a[1], 0);
-    if (!p || !p->allow_beacon || !*a[3] || !number(a[2], &side) || side > UINT32_MAX ||
-        !number(a[5], &first) || !number(a[6], &last) || !number(a[7], &err) ||
-        !rc_read_exact(a[4], reg + NONCE, 32)) return 0;
+    if (!p || !p->allow_beacon || !*args[1] || !number(args[0], &side) || side > UINT32_MAX ||
+        !number(args[3], &first) || !number(args[4], &last) || !number(args[5], &err) ||
+        !rc_read_exact(args[2], reg + NONCE, 32)) return 0;
     memcpy(reg, reg_tag, 8);
     memcpy(reg + PROFILE, p->id, sizeof(p->id));
     put(reg + SIDE, 4, side);
     put(reg + START_ROUND, 8, first);
     put(reg + PROOF_ROUND, 8, last);
     put(reg + CLOCK_ERROR, 8, err);
-    hash_one("stencil-entry-v1", a[3], strlen(a[3]), reg + ENTRY);
-    return reg_profile(reg) && rc_deliver(a[8], reg, sizeof(reg));
+    hash_one("stencil-entry-v1", args[1], strlen(args[1]), reg + ENTRY);
+    return reg_profile(reg) && rc_deliver(args[6], reg, sizeof(reg));
 }
 
 static int start_receipt(char **a)
@@ -245,8 +245,11 @@ static int verify_submission(char **a, const char *ledger)
 int bc_main(int argc, char **argv)
 {
     int ok;
-    if (!strcmp(argv[0], "beacon-register") && argc == 9)
-        ok = registration(argv);
+    if (!strcmp(argv[0], "beacon-register") && (argc == 8 || argc == 9)) {
+        const MatrixProfile *p = argc == 8 ? matrix_profile_id(MATRIX_THREE_BAND_ID) :
+                                             matrix_profile_command(argv[1], 0);
+        ok = registration(p, argv + (argc == 8 ? 1 : 2));
+    }
     else if (!strcmp(argv[0], "beacon-start") && argc == 4)
         ok = start_receipt(argv);
     else if (!strcmp(argv[0], "beacon-query") && (argc == 5 || argc == 6))
@@ -256,7 +259,7 @@ int bc_main(int argc, char **argv)
     else if (!strcmp(argv[0], "beacon-record") && argc == 8)
         ok = verify_submission(argv, argv[7]);
     else {
-        fputs("  beacon-register {2d|3d|signed3d} SIDE ENTRY NONCE32 START_ROUND PROOF_ROUND CLOCK_ERROR_NS REG\n"
+        fputs("  beacon-register [three-band] N ENTRY NONCE32 START_ROUND PROOF_ROUND CLOCK_ERROR_NS REG\n"
               "  beacon-start REG ROUND_SIG START\n"
               "  beacon-query REG START DIGEST REQUEST.tsq [POLICY_OID]\n"
               "  beacon-verify-stamp REG CA.pem POLICY_OID START DIGEST RESPONSE.tsr\n"

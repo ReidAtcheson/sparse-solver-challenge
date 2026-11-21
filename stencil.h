@@ -13,12 +13,14 @@ extern "C" {
  * caller owns all output buffers and releases instances with stencil_close(). */
 typedef struct stencil_instance stencil_instance;
 
-/* Authenticate a start receipt using the configured provider and trust file. */
+/* Authenticate a start receipt using the configured provider and trust file.
+ * Opening a three-band instance generates and caches its sparse rows once. */
 int stencil_instance_open(const char *trust_path, const char *start_path,
                           stencil_instance **out);
 
 /* Construct an instance from an already authenticated 32-byte seed, registered
- * profile ID and side (row count for the July fixture). The caller is responsible
+ * profile ID and side (row count for the three-band challenge or July fixture).
+ * The caller is responsible
  * for authenticating these inputs. Profile IDs are the exact protocol strings. */
 int stencil_instance_from_seed(const char *profile_id, uint32_t side,
                                const uint8_t seed[32], stencil_instance **out);
@@ -32,7 +34,8 @@ unsigned stencil_max_row_terms(const stencil_instance *instance);
  * Provide count+1 offsets, count RHS doubles, and capacity entries for each
  * of columns and values. capacity >= count * max_row_terms always suffices.
  * Request rows in any order. Ignore all outputs if a call reports an error.
- * Working space inside the library is independent of the number of rows. */
+ * The three-band instance holds a packed 32-bit CSR. Calls to stencil_rows
+ * on an open instance use constant additional working space. */
 int stencil_rows(const stencil_instance *instance, uint64_t first, size_t count,
                  uint64_t *offsets, uint32_t *columns, double *values,
                  size_t capacity, double *rhs);

@@ -1,6 +1,6 @@
-# Prover pseudocode for the signed 3D benchmark
+# Prover pseudocode for the signed three-band challenge
 
-The prover takes a private binary64 solution and produces a transcript certifying the joint 2-norm backward error of its encoded solution. This is the measured `STNPRF02` profile, with RHS entries $b_i=\sigma_i/m$ and $m$ matrix rows. The first procedure ends when the authority timestamps the commitment. The second can run later. [Companion validator](VALIDATOR.md)
+The prover takes a private binary64 solution and produces a transcript certifying an upper bound on the joint 2-norm backward error of its encoded solution. This example uses local signed receipts and the `STNPRF02` format, with RHS entries $b_i=\sigma_i/m$ and $m$ matrix rows. The first procedure ends when the authority timestamps the commitment. The second can run later. [Companion validator](VALIDATOR.md)
 
 The first sumcheck reduces the sum of squared residuals to a residual evaluated at one random point. The second ties that value, the 128 range-test sums and the solution norm to one opening of the stamped solution.
 
@@ -9,9 +9,10 @@ The first sumcheck reduces the sum of squared residuals to a residual evaluated 
 ```text
 COMMIT(start, pinned_authority_key, private_solution_file):
     verify the signed start with the pinned key                          # Ed25519, RFC 8032
-    require profile "signed-unit-torus-3d-backward80-v2"
-    m = start.side³                       # number of physical unknowns
-    L = log2(m)                           # registered sides are 32, 64, …, 1024
+    require profile "signed-three-band-backward80-v1"
+    m = start.side                        # signed field stores number of unknowns
+    require m is a power of two in [1024, 65536]
+    L = log2(m)
     w = 2^floor(L/2)                      # commitment columns
     H = m / w                             # commitment rows, X[a*w + c]
     seed = SHA256("stencil-instance-seed-v1" || start)
@@ -52,8 +53,8 @@ PROVE(start, finish, pinned_authority_key, private_solution_file, saved_E_and_C)
     mask_seed = first_32_bytes(challenge_bytes('M', 0))   # take this prefix BEFORE emitting E
     emit(signed_LE32(E), encode_points_in_order(C))
 
-    # Clear both dyadic denominators. Row(seed,side,i) returns (column, coefficient) pairs
-    # and a sign sigma[i]. The public real RHS entry is sigma[i]/m.
+    # Replay the signed three-band generator once into sparse rows.
+    # Row(i) gives the cached coefficients and the public RHS sign, sigma[i].
     s = 78 - E - L
     k = 2^max(-s, 0)
     h = 2^max( s, 0)
@@ -63,7 +64,7 @@ PROVE(start, finish, pinned_authority_key, private_solution_file, saved_E_and_C)
         for t with bits[t] == 1: T[t] += X(j)   # signed integer sums
     rho = Q = 0
     for i in 0 .. m-1:
-        terms, sign = Row(seed, start.side, i)
+        terms, sign = Row(i)
         R_i = k * sum((aij * X(j)) for (j,aij) in terms) - h * sign
         append field(R_i) to the private scratch table R
         rho += R_i²
@@ -84,7 +85,7 @@ PROVE(start, finish, pinned_authority_key, private_solution_file, saved_E_and_C)
     P[0..m-1] = 0 on private scratch
     sigma_u = 0
     for i in 0 .. m-1:
-        terms, sign = Row(seed, start.side, i)
+        terms, sign = Row(i)
         sigma_u += eq(u,i) * sign
         for (j,aij) in terms: P[j] += eq(u,i) * aij
     for j in 0 .. m-1:
@@ -124,7 +125,7 @@ PRODUCT_SUMCHECK(f, g, claim, role):
     return (point, f[0], g[0])
 ```
 
-These arrays describe the algebra. The C prover folds a single private scratch table in place. In the second sumcheck it rereads the private binary64 file for the first round and writes folded pairs back to the existing table. The large scratch file peaks at $32m$ bytes on disk. Only the transcript goes to the validator. [Proof driver](protocol.c) · [Disk folds](fold.c) · [Streaming operator](operator.c) · [Row generator](matrix.c)
+These arrays describe the algebra. The C prover folds a single private scratch table in place. In the second sumcheck it rereads the private binary64 file for the first round and writes folded pairs back to the existing table. The three-band prover holds the packed sparse rows through the residual and transpose scans. The large scratch file peaks at $32m$ bytes on disk. Only the transcript goes to the validator. [Proof driver](protocol.c) · [Disk folds](fold.c) · [Streaming operator](operator.c) · [Row generator](matrix.c)
 
 ## Sources behind the comments
 

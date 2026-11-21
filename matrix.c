@@ -1,10 +1,17 @@
 #include "matrix.h"
+#include "three_band.h"
+#include <assert.h>
+#include <errno.h>
+#include <stdlib.h>
 #include <string.h>
 
 _Static_assert(sizeof(MATRIX_PROFILE_ID) <= MATRIX_ID_BYTES &&
                sizeof(MATRIX_PROFILE_3D_ID) <= MATRIX_ID_BYTES &&
                sizeof(MATRIX_SIGNED3D_ID) <= MATRIX_ID_BYTES &&
+               sizeof(MATRIX_THREE_BAND_ID) <= MATRIX_ID_BYTES &&
                sizeof(MATRIX_BLOG_ID) <= MATRIX_ID_BYTES, "profile must fit the signed receipt");
+static Matrix three_band(uint32_t n, const uint8_t seed[32]);
+
 static Matrix diffusion3d(uint32_t side, const uint8_t seed[32])
 {
     return matrix_init_profile(side, 3, seed);
@@ -17,7 +24,12 @@ static Matrix july_fixture(uint32_t side, const uint8_t seed[32])
 }
 
 static const MatrixProfile profiles[] = {
-    {MATRIX_PROFILE_ID, "2d", "start", 2, 0, 5, 512, 32768, 1, matrix_init},
+    /* Simple graph: at most n unit terms in any row, for every seed. The
+     * protocol's absolute row-sum budget limits the largest registered n. */
+    {MATRIX_THREE_BAND_ID, "three-band", "start", 1, 1, MATRIX_ABS_ROW_LIMIT,
+     1024, MATRIX_ABS_ROW_LIMIT, 1, three_band},
+    /* Fixture identifiers are retained for replay and regression tests. */
+    {MATRIX_PROFILE_ID, "2d", "start2d", 2, 0, 5, 512, 32768, 1, matrix_init},
     {MATRIX_PROFILE_3D_ID, "3d", "start3d", 3, 0, 7, 32, 1024, 1, diffusion3d},
     {MATRIX_SIGNED3D_ID, "signed3d", "startsigned3d", 3, 1, 7, 32, 1024, 1, matrix_init_signed3d},
     {MATRIX_BLOG_ID, "blog", "startblog", 1, 0, 3, 1024, UINT32_C(1) << 30, 0, july_fixture},
@@ -80,6 +92,119 @@ static uint64_t le64(const unsigned char *p)
     for (unsigned k = 0; k < 8; ++k)
         x |= (uint64_t)p[k] << (8 * k);
     return x;
+}
+
+static Matrix three_band(uint32_t n, const uint8_t seed[32])
+{
+    /* Separate seed words for NumPy-compatible pattern and sign streams;
+     * the remaining two words key a row-addressable RHS sign generator. */
+    Matrix a = {
+        .side = n, .dimensions = 1, .signed_unit = 1,
+        .pattern_seed = le64(seed), .sign_seed = le64(seed + 8),
+        .rhs_key = mix64(le64(seed + 16) ^ mix64(le64(seed + 24))),
+    };
+    for (uint32_t t = n; t > 1; t >>= 1) ++a.side_log2;
+    return a;
+}
+
+int32_t matrix_three_band_rhs(const Matrix *a, uint64_t row)
+{
+    return (mix64(a->rhs_key + row) >> 63) ? 1 : -1;
+}
+
+int matrix_three_band_scan(const Matrix *a,
+                           int (*emit)(void *, size_t, size_t, int), void *context)
+{
+    if (!a || a->dimensions != 1 || !a->signed_unit || !emit) return EINVAL;
+    return tb_signed_scan(a->side, a->pattern_seed, TB_SIGN_SEED, a->sign_seed,
+                          NULL, emit, context);
+}
+
+typedef struct {
+    uint32_t *upper, *counts;
+    int8_t *diagonal;
+    size_t used;
+} EdgeBuffer;
+
+static int collect_edge(void *context, size_t i, size_t j, int sign)
+{
+    EdgeBuffer *buffer = context;
+    if (i == j) {
+        buffer->diagonal[i] = (int8_t)sign;
+    } else {
+        buffer->upper[buffer->used++] = ((uint32_t)j << 1) | (sign < 0);
+        ++buffer->counts[j];
+    }
+    ++buffer->counts[i];
+    return 0;
+}
+
+void matrix_release(Matrix *a)
+{
+    free(a->offsets);
+    free(a->entries);
+    a->offsets = a->entries = NULL;
+    a->max_row_terms = 0;
+}
+
+int matrix_prepare(Matrix *a)
+{
+    if (!a) return EINVAL;
+    if (a->dimensions != 1 || !a->signed_unit || a->offsets) return 0;
+    size_t n = a->side;
+    if (n < 3 || n > MATRIX_ABS_ROW_LIMIT) return EINVAL;
+    size_t upper_count = 3*n - 6;
+    uint32_t *offsets = calloc(n + 1, sizeof(*offsets));
+    EdgeBuffer b = {.upper = malloc(upper_count * sizeof(*b.upper)),
+                    .counts = offsets, .diagonal = malloc(n * sizeof(*b.diagonal))};
+    uint32_t *entries = NULL;
+    int error = ENOMEM;
+    if (!offsets || !b.upper || !b.diagonal) goto done;
+    error = matrix_three_band_scan(a, collect_edge, &b);
+    if (error) goto done;
+    assert(b.used == upper_count);
+
+    /* Turn degree counts into exclusive ends. Fill each row backwards from
+     * its end, leaving the offsets in their final CSR start positions. */
+    uint32_t nnz = 0, max_terms = 0;
+    for (size_t i = 0; i < n; ++i) {
+        if (offsets[i] > max_terms) max_terms = offsets[i];
+        nnz += offsets[i];
+        offsets[i] = nnz;
+    }
+    offsets[n] = nnz;
+    entries = malloc((size_t)nnz * sizeof(*entries));
+    if (!entries) { error = ENOMEM; goto done; }
+    size_t end = upper_count;
+    for (size_t i = n; i-- > 0;) {
+        size_t count = n-1-i < 3 ? n-1-i : 3;
+        size_t start = end - count;
+        /* Sort the at most three upper entries. Visiting source rows in
+         * descending order already orders the corresponding lower entries. */
+        for (size_t j = start + 1; j < end; ++j) {
+            uint32_t entry = b.upper[j];
+            size_t k = j;
+            while (k > start && entry < b.upper[k-1]) {
+                b.upper[k] = b.upper[k-1];
+                --k;
+            }
+            b.upper[k] = entry;
+        }
+        while (end > start) {
+            uint32_t entry = b.upper[--end];
+            entries[--offsets[i]] = entry;
+            entries[--offsets[entry >> 1]] = ((uint32_t)i << 1) | (entry & 1);
+        }
+        entries[--offsets[i]] = ((uint32_t)i << 1) | (b.diagonal[i] < 0);
+    }
+    a->offsets = offsets;
+    a->entries = entries;
+    a->max_row_terms = max_terms;
+done:
+    free(b.upper);
+    free(b.diagonal);
+    if (error) free(offsets);
+    return error;
 }
 
 Matrix matrix_init_profile(uint32_t side, unsigned dimensions, const unsigned char seed[32])
@@ -178,6 +303,7 @@ static void neighbor(MatrixRow *r, uint64_t col, int weight)
 
 void matrix_row(const Matrix *a, uint64_t i, MatrixRow *r)
 {
+    assert(a->dimensions != 1 || !a->signed_unit);
     if (a->dimensions == 1) {
         r->count = 0;
         if (i > 0) {
@@ -229,6 +355,14 @@ void matrix_row(const Matrix *a, uint64_t i, MatrixRow *r)
 
 int32_t matrix_visit(const Matrix *a, uint64_t i, MatrixTerm emit, void *context)
 {
+    if (a->dimensions == 1 && a->signed_unit) {
+        assert(a->offsets && a->entries && i < a->side);
+        for (uint32_t k = a->offsets[i]; k < a->offsets[i + 1]; ++k) {
+            uint32_t entry = a->entries[k];
+            emit(context, entry >> 1, entry & 1 ? -1 : 1);
+        }
+        return matrix_three_band_rhs(a, i);
+    }
     MatrixRow r;
     matrix_row(a, i, &r);
     for (int k = 0; k < r.count; ++k) emit(context, r.col[k], r.val[k]);

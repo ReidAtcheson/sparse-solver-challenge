@@ -1,5 +1,9 @@
 #include "matrix.h"
 #include "receipt.h"
+#include "three_band_lu.h"
+
+#include <dlfcn.h>
+#include <time.h>
 
 #include <float.h>
 #include <complex.h>
@@ -220,6 +224,49 @@ done:
     return ok;
 }
 
+static double elapsed_seconds(struct timespec a, struct timespec b)
+{
+    return (double)(b.tv_sec - a.tv_sec) + (double)(b.tv_nsec - a.tv_nsec) * 1e-9;
+}
+
+static int solve_three_band(Matrix *a, size_t n, const char *path)
+{
+    /* Only the private solver loads SuperLU and its BLAS runtime. */
+    void *library = dlopen("$ORIGIN/libstencil_superlu.so", RTLD_NOW | RTLD_LOCAL);
+    if (!library) {
+        fprintf(stderr, "three-band solver unavailable: %s\n"
+                "Install libsuperlu-dev and rebuild with make, or supply your own x.f64.\n",
+                dlerror());
+        return 0;
+    }
+    three_band_lu_fn *solve = (three_band_lu_fn *)dlsym(library, "stencil_three_band_lu");
+    struct timespec start, prepared, finished;
+    int ok = 0;
+    double *rhs = malloc(n * sizeof(*rhs)), *x = malloc(n * sizeof(*x));
+    if (!solve || !rhs || !x) {
+        fputs("failed to initialize three-band solver\n", stderr);
+        goto done;
+    }
+    clock_gettime(CLOCK_MONOTONIC, &start);
+    int error = matrix_prepare(a);
+    if (error) {
+        fprintf(stderr, "three-band generation failed: %s\n", strerror(error));
+        goto done;
+    }
+    for (size_t i = 0; i < n; ++i) rhs[i] = matrix_three_band_rhs(a, i) / (double)n;
+    clock_gettime(CLOCK_MONOTONIC, &prepared);
+    ok = solve((int)n, a->offsets, a->entries, rhs, x);
+    clock_gettime(CLOCK_MONOTONIC, &finished);
+    fprintf(stderr, "generation_seconds=%.9f solve_seconds=%.9f\n",
+            elapsed_seconds(start, prepared), elapsed_seconds(prepared, finished));
+    if (ok) ok = write_vector(path, x, n);
+done:
+    matrix_release(a);
+    free(rhs); free(x);
+    dlclose(library);
+    return ok;
+}
+
 int solve_main(int argc, char **argv)
 {
     if (argc != 4) {
@@ -240,6 +287,8 @@ int solve_main(int argc, char **argv)
     }
     size_t n = (size_t)rows;
     Matrix a = info.profile->initialize(info.side, info.seed);
+    if (info.profile == matrix_profile_id(MATRIX_THREE_BAND_ID))
+        return solve_three_band(&a, n, argv[3]) ? 0 : 1;
     if (info.profile == matrix_profile_id(MATRIX_BLOG_ID))
         return solve_blog(&a, n, argv[3]) ? 0 : 1;
     if (info.profile == matrix_profile_id(MATRIX_SIGNED3D_ID))

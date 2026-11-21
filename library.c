@@ -26,6 +26,8 @@ static int create(const MatrixProfile *profile, uint32_t side,
     instance->profile = profile;
     instance->matrix = profile->initialize(side, seed);
     instance->n = matrix_size(side, profile->dimensions);
+    int error = matrix_prepare(&instance->matrix);
+    if (error) { free(instance); return error; }
     *out = instance;
     return 0;
 }
@@ -54,6 +56,7 @@ int stencil_instance_from_seed(const char *profile_id, uint32_t side,
 
 void stencil_close(stencil_instance *instance)
 {
+    if (instance) matrix_release(&instance->matrix);
     free(instance);
 }
 
@@ -64,7 +67,8 @@ uint64_t stencil_row_count(const stencil_instance *instance)
 
 unsigned stencil_max_row_terms(const stencil_instance *instance)
 {
-    return instance ? instance->profile->max_terms : 0;
+    if (!instance) return 0;
+    return instance->matrix.offsets ? instance->matrix.max_row_terms : instance->profile->max_terms;
 }
 
 typedef struct {
@@ -92,8 +96,9 @@ int stencil_rows(const stencil_instance *instance, uint64_t first, size_t count,
     if (!instance || first > instance->n || count > instance->n - first ||
         !offsets || (count && !rhs) || (capacity && (!columns || !values))) return EINVAL;
     const Matrix *matrix = &instance->matrix;
-    const double matrix_scale = matrix->dimensions == 1 ? 0x1p-4 : 1.0;
-    const double rhs_scale = matrix->dimensions == 1 ? 0x1p-8 :
+    int july = matrix->dimensions == 1 && !matrix->signed_unit;
+    const double matrix_scale = july ? 0x1p-4 : 1.0;
+    const double rhs_scale = july ? 0x1p-8 :
                              (matrix->signed_unit ? 1.0 / (double)instance->n : 1.0);
     RowOutput out = {.columns = columns, .values = values, .capacity = capacity,
                      .n = instance->n, .scale = matrix_scale};
@@ -141,7 +146,10 @@ int stencil_commit_stream(FILE *input, uint64_t n, unsigned dimensions, int sign
     if (!wide) return vc_commit(input, width, height, cache, digest);
     int exponent, shift;
     if (!witness_exponent(input, n, &exponent)) return 0;
-    if (!witness_profile_shift(dimensions, bits, exponent, &shift)) { errno = ERANGE; return 0; }
+    if (!witness_profile_shift(dimensions, signed_unit, bits, exponent, &shift)) {
+        errno = ERANGE;
+        return 0;
+    }
     int32_t prefix = exponent;
     memcpy(cache, &prefix, sizeof(prefix));
     return vc_commit_wide(input, width, height, exponent, cache + sizeof(prefix), digest);

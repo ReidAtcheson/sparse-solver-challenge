@@ -1,6 +1,6 @@
-# Validator pseudocode for the signed 3D benchmark
+# Validator pseudocode for the signed three-band challenge
 
-The validator takes a proof byte stream, the authority’s pinned public key, and optionally the signed start received directly for the attempt. The current `signed-unit-torus-3d-backward80-v2` profile has $m$ rows and $b_i=\sigma_i/m$, where $\sigma_i=\pm1$. Its outputs are two exact integer energies, the joint 2-norm backward error, and the time from challenge release to the stamped solution commitment. The prover’s private binary64 file stays with the prover. [Companion prover pseudocode](PROVER.md)
+The validator takes a proof byte stream, the authority’s pinned public key, and optionally the signed start received directly for the attempt. The `signed-three-band-backward80-v1` profile has $m$ rows and $b_i=\sigma_i/m$, where $\sigma_i=\pm1$. Its outputs are two exact integer energies, an upper bound on joint 2-norm backward error, and the time from challenge release to the stamped solution commitment. The prover’s private binary64 file stays with the prover. [Companion prover pseudocode](PROVER.md)
 
 ## Check the receipts and read the claims
 
@@ -12,13 +12,14 @@ verify(proof, authority_key, expected_start = absent):
     start  = read(192 bytes)
     finish = read(160 bytes)
     require valid Ed25519 signatures on both receipts under authority_key
-    require valid receipt tags, reserved fields, and registered signed 3D profile
+    require valid receipt tags, reserved fields, and registered signed three-band profile
     require start.time > 0 and finish.time >= start.time
     require finish.attempt == SHA256("stencil-attempt-v1" || start)
     if expected_start is present: require start == expected_start
     seed = SHA256("stencil-instance-seed-v1" || start)
-    require start.side is a power of two in [32, 1024]
-    m = start.side^3; L = log2(m); w = 2^floor(L/2); H = m/w
+    m = start.side
+    require m is a power of two in [1024, 65536]
+    L = log2(m); w = 2^floor(L/2); H = m/w
 
     # Fiat–Shamir. Digest a COPY of the running hash with a role byte and LE32 index.
     # The signed finish includes the stamped digest and 16 bytes of issuer entropy.
@@ -81,11 +82,11 @@ The matrix-shaped commitment and its row folding follow the construction describ
 ## Regenerate the public endpoints and score the attempt
 
 ```text
-    Auv = 0; sigma_u = 0
-    for i = 0 .. m-1:
-        terms, sigma_i = Row(seed, start.side, i)
-        sigma_u += eq(u, i) * sigma_i
-        for (j, Aij) in terms: Auv += eq(u, i) * Aij * eq(v, j)
+    Auv = 0
+    for (i, j, sign) in signed_edges_and_diagonal(seed, m):
+        Auv += sign * eq(u, i) * eq(v, j)
+        if i != j: Auv += sign * eq(u, j) * eq(v, i)
+    sigma_u = sum_i eq(u, i) * rhs_sign(seed, i)
 
     # Regenerate 128 subset bits per coordinate in the same order as the prover.
     key = SHA256("seeded-stencil/exact-v1/range-mask" || mask_seed)
@@ -100,18 +101,19 @@ The matrix-shaped commitment and its row folding follow the construction describ
     weight_v = k*Auv + mask_v + lambda*xv
     require replay(claim, V, v) == xv * weight_v
 
-    # Rigal–Gaches joint normwise backward error. Here ||A||_2 = 7 exactly.
-    # Use arbitrary-precision integers for the acceptance decision.
-    a = 49*k^2*integer(Q); b = h^2*m; d = 2^106*integer(rho) - a - b
-    pass = (d <= 0) or (d^2 <= 4*a*b)              # equivalent to backward_2 <= 2^-53
-    relative_rhs = sqrt(rho)/(h*sqrt(m))            # displayed approximations
-    backward_2   = sqrt(rho)/(7*k*sqrt(Q) + h*sqrt(m))
+    # The squared Frobenius norm divided by m is a lower bound on ||A||_2².
+    # Cross-multiply the square-root comparison using arbitrary-precision integers.
+    a = (7*m - 12)*integer(Q)
+    b = h^2*m^2
+    d = 2^106*m*integer(rho) - a - b
+    pass = (d <= 0) or (d^2 <= 4*a*b)
+    relative_rhs = sqrt(rho)/(h*sqrt(m))
+    lower_norm = sqrt((7*m - 12)/m)
+    backward_2_upper = sqrt(rho)/(lower_norm*sqrt(Q) + h*sqrt(m))
     status = CERTIFIED_PASS if pass else CERTIFIED_MISS
-    return status, rho, Q, relative_rhs, backward_2, finish.time - start.time
+    return status, rho, Q, relative_rhs, backward_2_upper, finish.time - start.time
 ```
 
-The score is the least common relative perturbation to $A$ and $b$ that makes the encoded solution exact, allowing unstructured perturbations in the 2-norm. A valid proof above threshold is a **certified miss**. [Higham, *Testing Linear Algebra Software*, §2.1, giving the Rigal–Gaches formula](https://nhigham.com/wp-content/uploads/2023/10/high97t.pdf)
+Passing certifies joint normwise backward error at most $2^{-53}$ for the encoded solution. The integer tests establish whether the reported upper bound meets that target. [Numerical score and integer lifting](THREE_BAND_PROOF.md) · [Higham, *Testing Linear Algebra Software*, §2.1](https://nhigham.com/wp-content/uploads/2023/10/high97t.pdf)
 
-**Why integer scoring works.** The project’s subset test gives a loose centered-coordinate bound $|X_j|\le 2m2^{78}$ except with the range test’s soundness error. For a committed out-of-range coordinate, toggling its inclusion bit separates the two possible sums enough that at most one can pass. Under the independent random-mask model, 128 tests give error at most $2^{-128}$ for that fixed vector. The implementation expands the signed-receipt challenge pseudorandomly. With $m\le2^{30}$, this bound makes the true $Q\le2^{248}<q$. The explicit check then gives $Q\le m2^{156}$. Since $k\le64$, $h\le2^{108}$, and $\|A\|_2=7$, the ordinary residual norm is at most $7k\sqrt Q+h\sqrt m<2^{124}$. Both authenticated field energies therefore lift to integers, subject to the proof’s commitment, sumcheck and Fiat–Shamir assumptions. [Implementation and soundness discussion](REFERENCE.md#transcript-and-soundness-assumptions)
-
-**Validator resources.** Factor each equality weight into high- and low-index tables of sizes $H$ and $w$. The validator streams the generated rows once and the masks once, uses $O(\sqrt m)$ working memory, and reads the folded row from the proof. [C verifier](protocol.c) · [Public endpoint scan](operator.c)
+**Validator resources.** Factor each equality weight into high- and low-index tables of sizes $H$ and $w$. The validator reads the folded row from the proof and streams the generated edges and masks. The equality tables occupy $O(\sqrt m)$ space. The pattern generator adds $O(m)$ incoming-column counters. Each counter starts at one byte. The validator never materializes the sparse matrix or the solution. [C verifier](protocol.c) · [Public endpoint scan](operator.c)

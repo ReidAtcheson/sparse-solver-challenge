@@ -1,6 +1,6 @@
 # A timed attempt with drand quicknet and RFC 3161
 
-A judge publishes a registration for each entrant before a common start round. When that round arrives, everyone in the same profile and grid size gets the same seeded system. Each entrant solves the system, computes its row commitments, obtains an RFC 3161 timestamp and registers its digest. A second fixed drand round supplies unpredictable bits for the proof. The entrant can do the expensive proving work after that round. The score uses the timestamp on the commitment.
+A judge publishes a registration for each entrant before a common start round. When that round arrives, everyone in the same profile and row count gets the same seeded system. Each entrant solves the system, computes its row commitments, obtains an RFC 3161 timestamp and registers its digest. A second fixed drand round supplies unpredictable bits for the proof. The entrant can do the expensive proving work after that round. The score uses the timestamp on the commitment.
 
 To use a public authority, choose the FreeTSA or Sigstore preset and its trust settings before registration. The step-by-step guide covers issuance, offline verification and both real example receipts. [Public timestamp authorities](PUBLIC_TIMESTAMPS.md)
 
@@ -18,7 +18,7 @@ Before the start, the judge fixes the profile, size, entrant label, a 32-byte re
 ```sh
 # Judge. Publish the exact registration and trust settings before START_ROUND.
 openssl rand -out nonce32 32
-./stencil beacon-register 3d 32 team-a nonce32 "$START_ROUND" "$PROOF_ROUND" "$ERROR_NS" reg
+./stencil beacon-register 4096 team-a nonce32 "$START_ROUND" "$PROOF_ROUND" "$ERROR_NS" reg
 ```
 
 Fetch a signature when its round is available. The relay supplies transport. The C verifier checks the signature against the compiled Quicknet public key and the independently registered round. Quicknet round times are scheduled UTC release times. Actual network delivery may be later. [Quicknet parameters](https://docs.drand.love/blog/2023/10/16/quicknet-is-live/) · [drand specification](https://docs.drand.love/docs/specification/)

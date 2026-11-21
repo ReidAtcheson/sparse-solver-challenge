@@ -25,3 +25,5 @@ __pycache__/
 **/authority/key
 **/private/
 **/ledger/
+
+/libstencil_superlu.so

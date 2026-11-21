@@ -1,5 +1,6 @@
 #ifndef STENCIL_MATRIX_H
 #define STENCIL_MATRIX_H
+#include <stddef.h>
 #include <stdint.h>
 
 /* Public callers may request any row in any order. */
@@ -9,12 +10,19 @@ typedef struct {
     unsigned dimensions;
     int signed_unit;
     uint64_t horizontal_key, vertical_key, depth_key, rhs_key;
+    uint64_t pattern_seed, sign_seed;
+    /* Optional indexed three-band representation. Entries encode
+     * (column << 1) | (coefficient < 0) in sorted column order. */
+    uint32_t *offsets, *entries;
+    unsigned max_row_terms;
 } Matrix;
 
 /* The protocol consumes this streaming interface only. Emit each (column,
  * signed coefficient) synchronously and return the row's signed RHS. Terms
  * may repeat or arrive in any order. There is no row buffer or degree
- * parameter. A generator must use bounded local state. For this integer
+ * parameter. Prepare an indexed three-band matrix before requesting rows.
+ * The validator can instead stream signed pairs via matrix_three_band_scan.
+ * For this integer
  * interface the emitted absolute coefficients must sum to at most 65536 per
  * row and the RHS numerator is a signed 32-bit integer. The signed-unit
  * profile divides that numerator by the number of rows, with integer RHS
@@ -25,6 +33,7 @@ typedef struct {
 #define MATRIX_PROFILE_3D_ID "seeded-stencil-3d-exact-residual-v1"
 #define MATRIX_SIGNED3D_ID "signed-unit-torus-3d-backward80-v2"
 #define MATRIX_BLOG_ID "july-tridiagonal-fixed-nonce-80-v1"
+#define MATRIX_THREE_BAND_ID "signed-three-band-backward80-v1"
 enum { MATRIX_ID_BYTES = 40 };
 typedef struct matrix_profile {
     char id[MATRIX_ID_BYTES];  /* canonical zero-padded wire bytes */
@@ -44,6 +53,16 @@ const MatrixProfile *matrix_profile_command(const char *name, int local_start);
 const MatrixProfile *matrix_profile_kind(unsigned dimensions, int signed_unit);
 int matrix_profile_side(const MatrixProfile *profile, uint64_t side);
 enum { MATRIX_ABS_ROW_LIMIT = 65536 };
+/* Prepare arbitrary row access once, returning an errno value or zero. Other
+ * profiles need no allocation. A prepared Matrix owns its arrays; do not copy
+ * it. Releasing it also permits replaying from the same seeds. */
+int matrix_prepare(Matrix *a);
+void matrix_release(Matrix *a);
+/* Stream each signed upper edge once, then each signed diagonal in original
+ * index order. Requires no prepared matrix. Callback and result are errno-style. */
+int matrix_three_band_scan(const Matrix *a,
+                           int (*emit)(void *, size_t, size_t, int), void *context);
+int32_t matrix_three_band_rhs(const Matrix *a, uint64_t row);
 typedef void (*MatrixTerm)(void *context, uint64_t column, int32_t coefficient);
 int32_t matrix_visit(const Matrix *a, uint64_t row, MatrixTerm emit, void *context);
 
@@ -58,7 +77,7 @@ typedef struct {
 Matrix matrix_init(uint32_t side, const unsigned char seed[32]);
 /* dimensions is 2 or 3. Registered profiles satisfy side^dimensions <= 2^30. */
 Matrix matrix_init_profile(uint32_t side, unsigned dimensions, const unsigned char seed[32]);
-/* Signed periodic seven-point matrix. matrix_visit returns the numerator
+/* Testing-only signed periodic seven-point matrix. matrix_visit returns the numerator
  * of b_i = +/-1 / side^3. Every eigenvalue is seed independent. */
 Matrix matrix_init_signed3d(uint32_t side, const unsigned char seed[32]);
 /* Fixed public replay of the July v4 benchmark, with n tridiagonal rows. */

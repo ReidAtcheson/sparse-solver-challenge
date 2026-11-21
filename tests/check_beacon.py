@@ -12,6 +12,7 @@ import tempfile
 import time
 
 from check_rfc3161 import create_tsa, run
+from library import three_band_reference
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.extend([str(ROOT / "examples"), str(ROOT / "benchmarks")])
 from library_solve import checked, Handle, load
@@ -25,6 +26,53 @@ ROUNDS = {
                 "787d2466a29ab01be346b95e771c727676e54368ef662dbb",
 }
 POLICY = "1.2.3.4.5"
+
+
+def instance_seed(reg, start_sig):
+    chain = bytes.fromhex("52db9ba70e0cc0f6eaf7803dd07447a1f5477735fd3f661792ba94600c84e971")
+    manifest = reg.read_bytes()
+    entropy = hashlib.sha256(start_sig.read_bytes()).digest()
+    return hashlib.sha256(b"stencil-quicknet-instance-v1" + chain + manifest[8:52]
+                          + manifest[56:64] + entropy).digest()
+
+
+def check_three_band(base, binary, clock, start_sig, end_sig, tsa):
+    private, public = base / "band-entrant", base / "band-validator"
+    private.mkdir()
+    public.mkdir()
+    n = 1024
+    (private / "nonce").write_bytes(bytes(range(32)))
+    args = (str(n), "solver", "nonce", start_sig.name, end_sig.name, "2000000000")
+    reg = private / "reg"
+    run(private, binary, "beacon-register", *args, reg)
+    run(private, binary, "beacon-register", "three-band", *args, "explicit-reg")
+    assert reg.read_bytes() == (private / "explicit-reg").read_bytes()
+    assert reg.read_bytes()[8:48].rstrip(b"\0") == b"signed-three-band-backward80-v1"
+    run(private, binary, "beacon-start", reg, start_sig, "start")
+
+    # The deliberately inaccurate x = e_0/n has an exactly predictable score.
+    # This exercises a nonidentity commitment without a solver dependency.
+    x = (C.c_double * n)(1/n)
+    (private / "x").write_bytes(bytes(x))
+    run(private, binary, "commit", reg, "start", "x", "rows", "digest")
+    run(private, binary, "beacon-query", reg, "start", "digest", tsa / "band.tsq", POLICY)
+    run(tsa, clock, "band.tsq", "1704067200", "band.tsr")
+    ca, token = tsa / "ca.pem", tsa / "band.tsr"
+    run(private, binary, "beacon-verify-stamp", reg, ca, POLICY, "start", "digest", token)
+    run(private, binary, "prove-beacon", reg, ca, POLICY, "start", "digest", token,
+        end_sig, "x", "rows", public / "proof")
+    for path in (reg, ca, private / "digest"):
+        shutil.copy(path, public / path.name)
+    assert {p.name for p in public.iterdir()} == {"reg", "ca.pem", "digest", "proof"}
+    result = subprocess.run([binary, "verify-beacon", "reg", "ca.pem", POLICY, "digest", "proof"],
+                            cwd=public, capture_output=True, text=True)
+    assert result.returncode == 3, (result.returncode, result.stdout, result.stderr)
+    metrics = dict(word.split("=", 1) for word in result.stdout.split() if "=" in word)
+    assert metrics["target"] == "miss" and int(metrics["exponent"]) == -10
+    assert int(metrics["x_squared"]) == 1 << 156
+    reference = three_band_reference(binary, n, instance_seed(reg, start_sig))
+    energy = sum((dict(row).get(0, 0) - int(rhs*n))**2 for row, rhs in reference) << 156
+    assert int(metrics["rho"]) == energy
 
 
 def check_signed3d(base, binary, clock, reg, start_sig, end_sig, tsa):
@@ -66,11 +114,7 @@ def check_signed3d(base, binary, clock, reg, start_sig, end_sig, tsa):
     assert {p.name for p in public.iterdir()} == {"reg", "ca.pem", "digest", "proof"}
 
     # Regenerate the native instance seed and compute both energies in Python integers.
-    chain = bytes.fromhex("52db9ba70e0cc0f6eaf7803dd07447a1f5477735fd3f661792ba94600c84e971")
-    manifest = reg.read_bytes()
-    entropy = hashlib.sha256(start_sig.read_bytes()).digest()
-    seed = hashlib.sha256(b"stencil-quicknet-instance-v1" + chain + manifest[8:52]
-                          + manifest[56:64] + entropy).digest()
+    seed = instance_seed(reg, start_sig)
     scores = integer_scores(32, seed, solution)
     for key in ("exponent", "rho", "x_squared"):
         assert int(metrics[key]) == scores[key]
@@ -90,6 +134,7 @@ def check(base, binary, clock):
     for rnd, sig in ROUNDS.items():
         (prover / str(rnd)).write_bytes(bytes.fromhex(sig))
     start_sig, end_sig = (str(rnd) for rnd in ROUNDS)
+    check_three_band(base, binary, clock, prover / start_sig, prover / end_sig, tsa)
     register = (binary, "beacon-register", "3d", "32", "alice", "nonce",
                 start_sig, end_sig, "2000000000")
     run(prover, *register, "reg")

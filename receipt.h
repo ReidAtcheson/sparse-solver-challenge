@@ -57,7 +57,8 @@ int rc_verify_start(const char *trust, const uint8_t *start, struct rc_info *out
 int rc_verify_pair(const char *trust, const uint8_t *start, const uint8_t *finish,
                    struct rc_info *out);
 
-/* argv[0] is keygen, start, start3d, startsigned3d, startblog, stamp or stamp-stdio. The stdio endpoint reads
+/* start registers a three-band challenge; start2d, start3d, startsigned3d
+ * and startblog create fixtures. The stdio endpoint reads
  * exactly START || digest, checks the authority-supplied authenticated entrant
  * label, and writes the recorded FINISH receipt. Returns a process exit code. */
 int receipt_main(int argc, char **argv);

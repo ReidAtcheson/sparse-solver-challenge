@@ -16,9 +16,20 @@ receipt_objects = receipt.o beacon.o drand.o rfc3161.o
 library_objects = three_band.o three_band_rng.o library.o witness.o commit.o matrix.o $(receipt_objects)
 objects = scratch.o three_band_cli.o protocol.o fold.o mask.o operator.o solve.o $(library_objects)
 
+# Optional numerical solver; the prover and validator run without BLAS.
+SUPERLU_LIBS ?= $(shell pkg-config --libs superlu 2>/dev/null)
+SUPERLU_CFLAGS ?= $(shell pkg-config --cflags superlu 2>/dev/null)
 all: stencil libstencil.so
+ifneq ($(strip $(SUPERLU_LIBS)),)
+all: libstencil_superlu.so
+endif
+three_band_lu.o: CPPFLAGS += $(SUPERLU_CFLAGS)
+libstencil_superlu.so: three_band_lu.o
+	$(CC) -shared $(LDFLAGS) -o $@ $^ $(SUPERLU_LIBS)
+-include three_band_lu.d
+
 stencil: $(objects) $(BLST_LIB)
-	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS)
+	$(CC) $(LDFLAGS) -o $@ $^ $(LDLIBS) -ldl
 libstencil.so: $(library_objects) $(BLST_LIB)
 	$(CC) -shared $(LDFLAGS) -o $@ $^ $(LDLIBS)
 # Recompile the backend on either change of configuration, including when a
@@ -56,6 +67,7 @@ check: all check-three-band tests/check-commit tests/check-generator tests/check
 	./tests/check-generator
 	./tests/check-drand
 	python3 tests/check.py ./stencil
+	python3 tests/check_three_band_challenge.py
 	python3 tests/check_rfc3161.py ./stencil
 	python3 tests/check_public_tsa.py
 	python3 tests/library.py
@@ -73,7 +85,7 @@ check-signed3d: stencil
 	python3 tests/signed_spectrum.py
 	python3 benchmarks/signed3d.py --sides 32 --regression --no-save
 clean:
-	$(RM) tests/check-three-band-rng tests/check-three-band-c stencil libstencil.so stencil-direct3d direct3d.o direct3d.d tests/check-commit tests/check-generator tests/check-drand tests/check-tsa-clock $(objects) $(objects:.o=.d) .stencil-blst-config
+	$(RM) three_band_lu.o three_band_lu.d libstencil_superlu.so tests/check-three-band-rng tests/check-three-band-c stencil libstencil.so stencil-direct3d direct3d.o direct3d.d tests/check-commit tests/check-generator tests/check-drand tests/check-tsa-clock $(objects) $(objects:.o=.d) .stencil-blst-config
 -include $(objects:.o=.d)
 .PHONY: all FORCE check check-three-band check-three-band-reference check-beacon check-signed3d clean
 

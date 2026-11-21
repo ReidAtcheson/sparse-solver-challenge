@@ -31,7 +31,7 @@ def trial(helper, binary, side, number, tmp, capped, public_dir):
         stages = {}
 
         def measure(phase, *args, directory=prover, cap=0, expected=0):
-            run = subprocess.run([helper, str(cap), binary, phase, *map(str, args)],
+            run = subprocess.run([helper, str(cap), binary, ("start2d" if phase == "start" else phase), *map(str, args)],
                                  cwd=directory, text=True, capture_output=True,
                                  env={**os.environ, "TMPDIR": str(tmp)})
             record = re.search(r"^MEASURE (\d+) (\d+)\n\Z", run.stderr, re.M)

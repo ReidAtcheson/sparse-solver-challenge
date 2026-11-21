@@ -14,11 +14,35 @@ sys.path.insert(0, str(ROOT / "examples"))
 from library_solve import Handle, checked, load, run
 
 PROFILES = (
+    ("start", "signed-three-band-backward80-v1", 1024, 1),
     ("startblog", "july-tridiagonal-fixed-nonce-80-v1", 1024, 1),
     ("startsigned3d", "signed-unit-torus-3d-backward80-v2", 32, 3),
     ("start3d", "seeded-stencil-3d-exact-residual-v1", 32, 3),
-    ("start", "seeded-stencil-exact-residual-v1", 512, 2),
+    ("start2d", "seeded-stencil-exact-residual-v1", 512, 2),
 )
+
+
+def three_band_reference(binary, n, seed):
+    pattern, sign, rhs_a, rhs_b = (int.from_bytes(seed[i:i+8], "little") for i in range(0, 32, 8))
+    output = subprocess.check_output([binary, "three-band", str(n), str(pattern),
+                                      "--sign-seed", str(sign)], text=True)
+    rows = [[] for _ in range(n)]
+    for line in output.splitlines()[2:]:
+        i, j, value = map(int, line.split())
+        rows[i-1].append((j-1, value))
+        if i != j:
+            rows[j-1].append((i-1, value))
+    assert sum(map(len, rows)) == 7*n - 12
+    mask = (1 << 64) - 1
+
+    def mix(x):
+        x = ((x ^ (x >> 30)) * 0xbf58476d1ce4e5b9) & mask
+        x = ((x ^ (x >> 27)) * 0x94d049bb133111eb) & mask
+        return x ^ (x >> 31)
+
+    key = mix(rhs_a ^ mix(rhs_b))
+    return [(sorted(row), (1 if mix((key+i) & mask) >> 63 else -1) / n)
+            for i, row in enumerate(rows)]
 
 
 def check_profile(work, api, binary, command, profile, side, dimensions):
@@ -33,6 +57,9 @@ def check_profile(work, api, binary, command, profile, side, dimensions):
     checked(api.stencil_instance_open(os.fsencode(work / "pk"), os.fsencode(start), C.byref(a)))
     checked(api.stencil_instance_from_seed(profile.encode(), side, seed_buf, C.byref(b)))
     n, degree = side**dimensions, 1 + 2 * dimensions
+    if command == "start":
+        reference = three_band_reference(binary, n, seed)
+        degree = max(len(row) for row, rhs in reference)
     for h in (a, b):
         assert api.stencil_row_count(h) == n and api.stencil_max_row_terms(h) == degree
 
@@ -45,10 +72,12 @@ def check_profile(work, api, binary, command, profile, side, dimensions):
         assert offsets[0] == 0 and 0 < offsets[1] <= degree
         return list(zip(cols[:offsets[1]], vals[:offsets[1]])), rhs.value
 
-    for i in [n - 1, 0, 3, n // 2]:
+    for i in (reversed(range(n)) if command == "start" else [n - 1, 0, 3, n // 2]):
         terms, rhs = row(a, i)
         assert row(b, i) == (terms, rhs)
-        if command == "startblog":
+        if command == "start":
+            assert (terms, rhs) == reference[i]
+        elif command == "startblog":
             assert (i, 0.5) in terms and all(v == 0.0625 for j, v in terms if j != i)
             assert 144 <= abs(rhs) * 256 <= 207
         elif command == "startsigned3d":
