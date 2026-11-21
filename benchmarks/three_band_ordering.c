@@ -12,7 +12,10 @@
 #include <stdio.h>
 #include <string.h>
 
-enum { N = 4096, TRAINING_SEED = 42 };
+#ifndef ORDERING_ROWS
+#define ORDERING_ROWS 4096
+#endif
+enum { N = ORDERING_ROWS, TRAINING_SEED = 42, LAST_SEED = 49 };
 
 static int append_entry(void *context, size_t row, size_t column)
 {
@@ -70,7 +73,7 @@ int main(void)
     for (int i = 0; i < N; ++i) natural[i] = i;
     puts("n pattern_seed natural_nnz_L reused_metis42_nnz_L fresh_metis_nnz_L reused_over_fresh");
     int ok = 1;
-    for (unsigned seed = TRAINING_SEED; seed <= 45 && ok; ++seed) {
+    for (unsigned seed = TRAINING_SEED; seed <= LAST_SEED && ok; ++seed) {
         cholmod_sparse *matrix = make_pattern(seed, &common);
         ok = matrix && cholmod_metis(matrix, NULL, 0, 0, fresh, &common);
         if (ok) {

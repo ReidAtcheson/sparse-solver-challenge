@@ -156,7 +156,7 @@ def run_trial(args, helper, case, env, work, checkpoint, oracle):
             return measure(helper, [program, *map(str, cmd)], cwd, env, case, name, checkpoint, cap)
 
         stage("keygen", args.binary, "keygen", "sk", "pk")
-        stage("start", args.binary, "start3d", "sk", side, f"cube-{side}-{case['trial']}", "start")
+        stage("start", args.binary, "fixture", "start3d", "sk", side, f"cube-{side}-{case['trial']}", "start")
         start = (p / "start").read_bytes()
         if (len(start) != 192 or int.from_bytes(start[8:12], "little") != side
                 or start[88:128].rstrip(b"\0") != PROFILE):

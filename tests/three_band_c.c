@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <fenv.h>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -89,6 +90,32 @@ static void verify(size_t n, uint64_t seed)
     tb_pattern_free(p);
 }
 
+/* At 32^3 rows the third band is disjoint from the first two. Follow
+ * the whole stream through many ring wraps and verify bounds, distinct
+ * choices, the presence of far-band tail draws and the count per row. */
+typedef struct {
+    size_t n, row, seen, total, separated_tail, previous[3];
+} bounds_check;
+
+static int check_bounds(void *context, size_t row, size_t column)
+{
+    bounds_check *c = context;
+    if (row != c->row) {
+        assert(row == c->row + 1 && c->seen == (c->n - 1 - c->row < 3 ? c->n - 1 - c->row : 3));
+        c->row = row;
+        c->seen = 0;
+    }
+    assert(column > row && column < c->n && c->seen < 3);
+    for (size_t j = 0; j < c->seen; ++j) assert(c->previous[j] != column);
+    double distance = (double)(column - row);
+    assert(fabs(distance - 1) <= 200 || fabs(distance - 32) <= 200 ||
+           fabs(distance - 1024) <= 200);
+    if (distance >= 824 && fabs(distance - 1024) >= 100) ++c->separated_tail;
+    c->previous[c->seen++] = column;
+    ++c->total;
+    return 0;
+}
+
 int main(void)
 {
     tb_pattern *invalid;
@@ -97,6 +124,11 @@ int main(void)
     verify(3, 0);
     verify(101, UINT64_C(0x12345678abcdef));
     verify(343, 87);
+    bounds_check check = {.n = 32768};
+    assert(tb_pattern_scan(check.n, 42, check_bounds, &check) == 0);
+    assert(check.row == check.n - 2 && check.seen == 1 && check.total == 3 * check.n - 6);
+    assert(check.separated_tail > 0);
+
     puts("PASS three-band signed edge scan, sorted CSR/CSC, permutations and rounding");
     return 0;
 }

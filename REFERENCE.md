@@ -2,6 +2,8 @@
 
 `stencil` takes a private binary64 solution file and public generator seed, commits to the fixed-point solution, and proves the exact integer squared residual. The timestamp authority can close the timed interval as soon as it receives the 32-byte commitment digest. The local verifier uses a pinned Ed25519 key and the expected start. The external receipt mode verifies two drand rounds and an RFC 3161 commitment timestamp against the judge’s registration, TSA trust settings and first accepted digest. [External receipt workflow](BEACON.md)
 
+The current challenge uses the bounded signed three-band generator. The following implementation notes also cover historical test fixtures. [Challenge guide](README.md) · [Bounded generator specification](THREE_BAND.md)
+
 The two original generators produce seeded random screened diffusion problems on square and cubic grids. Both operators are $4I$ plus a weighted Laplacian with zero Dirichlet boundary values. Each face has a conductance in $\{1,2,3,4\}$ shared by its adjacent cells. A separate seed-derived key generates the $\pm1$ RHS. The matrix-free CG solver regenerates rows and performs one iterative refinement. A separate 3D solver uses Intel MKL PARDISO to factor the matrix and refine the solution. The proof uses the generator's row iterator. A public generator can emit terms in arbitrary column order, revisit columns, and have a different sparsity pattern in every row. For these diffusion fixtures, validator time scales with the number of generated entries and rows, and its memory scales with the square root of the number of rows.
 
 The signed-unit 3D profile adds a shared-exponent 80-bit solution and certifies joint 2-norm backward error down to a threshold of $2^{-53}$. Its matrix has seven unit-magnitude entries per row, and its RHS has 1-norm one. [How the proof components fit together](CONTRACTS.md) · [Protocol](#shared-exponent-signed-3d-profile) · [Measured size, time and memory](benchmarks/SIGNED3D.md)
@@ -12,7 +14,7 @@ The default signed three-band challenge produces matrices with a seed-dependent 
 
 `make` builds both the UNIX tool and `libstencil.so`. Open an authenticated start with `stencil_instance_open`, request any contiguous range of matrix rows and RHS entries with `stencil_rows`, and pass the solver’s contiguous binary64 buffer to `stencil_commit`. The caller chooses its batch size and owns the resulting CSR arrays. The library returns the same row cache and 32-byte digest as the CLI. [C API](stencil.h)
 
-The Linux Python example generates rows in physical units, solves directly into an anonymous memory mapping, commits that buffer, and passes the descriptor to a separate C proof worker. It runs the validator with public inputs after the private mapping has closed. Run `python3 examples/library_solve.py demo-public` in the built source tree, using a fresh output directory. The algebraic prover uses temporary scratch for its folds. [Python example](examples/library_solve.py)
+The Linux Python example reads bounded three-band rows in physical units, solves with SciPy sparse LU, and commits a solution in an anonymous memory mapping. It passes the descriptor to a separate C proof worker. The example requires NumPy and SciPy. It runs the validator with public inputs after the private mapping has closed. Run `python3 examples/library_solve.py demo-public` in the built source tree, using a fresh output directory. The algebraic prover uses temporary scratch for its folds. [Python example](examples/library_solve.py)
 
 Independent implementations can use any solver and generate the proof themselves. Compare encodings and challenges against the public known-answer transcript, then run the reference validator on the resulting proof. The signed start binds the generator and scoring rules to their versioned profile. [Protocol and interoperability vectors](INTEROP.md) · [External transcript format](BEACON.md)
 
@@ -39,12 +41,12 @@ cp solver/proof.bin validator/
 (cd validator && "$tool" verify ../authority/pub proof.bin ../start)
 ```
 
-For a cube, use `start3d` and the stand-alone direct solver. Building `direct3d` requires MKL development headers and the `mkl_rt` and GNU threading libraries. On Ubuntu 24.04 the VM setup installs `libmkl-dev` and `libmkl-gnu-thread`. Set `MKL_CPPFLAGS` or `MKL_LIBS` when building against an installation in a nonstandard location. The proof and validator use the same dependencies across generator profiles.
+For a cube, use `fixture start3d` and the stand-alone direct solver. Building `direct3d` requires MKL development headers and the `mkl_rt` and GNU threading libraries. On Ubuntu 24.04 the VM setup installs `libmkl-dev` and `libmkl-gnu-thread`. Set `MKL_CPPFLAGS` or `MKL_LIBS` when building against an installation in a nonstandard location. The proof and validator use the same dependencies across generator profiles.
 
 ```sh
 # From the source directory, following the example above.
 make direct3d
-./stencil start3d run/authority/key 64 team-a run/start3d
+./stencil fixture start3d run/authority/key 64 team-a run/start3d
 MKL_NUM_THREADS=8 OMP_NUM_THREADS=8 MKL_DYNAMIC=FALSE \
   ./stencil-direct3d run/authority/pub run/start3d run/solver/x3d.f64
 ./stencil commit run/authority/pub run/start3d run/solver/x3d.f64 run/solver/rows3d run/solver/digest3d
@@ -131,7 +133,7 @@ mkdir signed-run
 cd signed-run
 tool=../stencil
 "$tool" keygen sk pk
-"$tool" startsigned3d sk 64 entrant start
+"$tool" fixture startsigned3d sk 64 entrant start
 "$tool" solve pk start x.f64
 "$tool" commit pk start x.f64 rows digest
 "$tool" stamp sk start digest finish
@@ -164,13 +166,13 @@ The 128 subset tests now use $T=m2^{78}$. Subject to the range and commitment so
 
 The private input occupies $8n$ bytes. The prover reads and quantizes it in bounded chunks and keeps at most one large private scratch file of $32n$ bytes. The residual sumcheck folds that file in place and closes it. The matvec then uses a fresh file of the same maximum size for the weighted transpose. Two weights are replaced in place by one pair of folded field values. Later rounds truncate the file geometrically. Scratch files are private and unlinked. Use `TMPDIR` on a disk-backed filesystem when enforcing a RAM budget. On tmpfs the scratch space itself consumes memory.
 
-The process working set is $O(\sqrt n)$ for commitment, proving, and validation. The row generator has $O(1)$ working state. The input, benchmark artifacts, and OS filesystem cache are accounted separately from process RSS. The original commit stage scans the binary64 file once with bounded row buffers. The shared-exponent profile takes an initial scan to choose its exponent. The verifier uses only RAM for its working tables. The CG solver uses five binary64 vectors during refinement, or $40n$ bytes. The direct solver keeps CSR input, factor data, and numerical vectors during the solve. Its peak RSS includes factorization fill and MKL workspace. The ordering of memory use depends on the solver being compared and on the host's accounting of file cache.
+For the fixed-stencil fixtures in this comparison, the process working set is $O(\sqrt n)$ for commitment, proving, and validation. The row generator has $O(1)$ working state. The input, benchmark artifacts, and OS filesystem cache are accounted separately from process RSS. The original commit stage scans the binary64 file once with bounded row buffers. The shared-exponent profile takes an initial scan to choose its exponent. The verifier uses only RAM for its working tables. The CG solver uses five binary64 vectors during refinement, or $40n$ bytes. The direct solver keeps CSR input, factor data, and numerical vectors during the solve. Its peak RSS includes factorization fill and MKL workspace. The ordering of memory use depends on the solver being compared and on the host's accounting of file cache.
 
 The signed 2D profile ID is `seeded-stencil-exact-residual-v1` and the signed 3D ID is `seeded-stencil-3d-exact-residual-v1`. To add a generator, implement its seed setup in `matrix_init_profile` and its row stream in `matrix_visit`, then register a distinct profile ID with the receipt issuer and verifier. The callback emits integer terms and returns the RHS. The proof and validator request rows in ascending order within each matrix pass. A generator may regenerate rows on demand or keep a bounded sequential cursor and reset it at each pass. The proof does not materialize $A$. The time bounds assume generation overhead proportional to emitted work; a generator that restarts a long scan for every row can cost more. Integer-coefficient or agreed fixed-point encodings, row bounds and an exact score normalization are part of the profile. The included CG command is specific to the test stencil and optional for other generators.
 
 ## Reproduce measurements
 
-**July tridiagonal comparison.** `startblog SECRET ROWS ENTRY START` selects a fixed replay of the July matrix and RHS. It uses the original public nonce at every row count and issues fresh commitment receipts. The C prover and validator use the shared-exponent format. The harness checks every encoded coordinate against the original Rust solver. [Matched-process RSS and transcript measurements](benchmarks/blog-comparison/README.md)
+**July tridiagonal comparison.** `fixture startblog SECRET ROWS ENTRY START` selects a fixed replay of the July matrix and RHS. It uses the original public nonce at every row count and issues fresh commitment receipts. The C prover and validator use the shared-exponent format. The harness checks every encoded coordinate against the original Rust solver. [Matched-process RSS and transcript measurements](benchmarks/blog-comparison/README.md)
 
 **2D on Linux.**
 

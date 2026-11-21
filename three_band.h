@@ -8,14 +8,15 @@
 extern "C" {
 #endif
 
-/* Independent signed three-band test family, in original zero-based vertex
+/* Signed bounded three-band challenge family, in original zero-based vertex
  * order. Functions return 0 on success and an errno value on failure. */
 typedef struct tb_pattern tb_pattern;
 typedef int (*tb_edge_fn)(void *context, size_t row, size_t column);
 
 /* Replay a seed from row zero, emitting each strict-upper edge once, in draw
  * order. A callback error stops the scan and is returned to the caller.
- * Working storage starts at one counter byte per vertex. The generator
+ * Pattern storage is a rolling ring of 16-bit incoming counts with size
+ * O(min(n, n^(2/3) + 201)). The generator
  * establishes round-to-nearest and restores the calling thread's floating
  * point environment on return. Callbacks must preserve its rounding mode. */
 int tb_pattern_scan(size_t n, uint64_t pattern_seed, tb_edge_fn visit, void *context);
@@ -45,6 +46,11 @@ typedef int (*tb_entry_fn)(void *context, size_t row, size_t column, int sign);
 int tb_signed_scan(size_t n, uint64_t pattern_seed, tb_sign_mode mode,
                    uint64_t sign_seed_or_draw, const size_t *perm,
                    tb_entry_fn emit, void *context);
+
+/* Compatibility entry point for archived unbounded v1 transcripts. */
+int tb_signed_scan_v1(size_t n, uint64_t pattern_seed, tb_sign_mode mode,
+                      uint64_t sign_seed_or_draw, const size_t *perm,
+                      tb_entry_fn emit, void *context);
 
 typedef enum { TB_CSR, TB_CSC } tb_format;
 typedef struct {

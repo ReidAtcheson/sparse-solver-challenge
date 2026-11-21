@@ -44,10 +44,13 @@ def check_three_band(base, binary, clock, start_sig, end_sig, tsa):
     (private / "nonce").write_bytes(bytes(range(32)))
     args = (str(n), "solver", "nonce", start_sig.name, end_sig.name, "2000000000")
     reg = private / "reg"
+    for retired, rows in (("three-band-v1", 1024), ("3d", 32), ("signed3d", 32), ("2d", 512)):
+        run(private, binary, "beacon-register", retired, str(rows), *args[1:], "retired-reg", ok=False)
+        assert not (private / "retired-reg").exists()
     run(private, binary, "beacon-register", *args, reg)
     run(private, binary, "beacon-register", "three-band", *args, "explicit-reg")
     assert reg.read_bytes() == (private / "explicit-reg").read_bytes()
-    assert reg.read_bytes()[8:48].rstrip(b"\0") == b"signed-three-band-backward80-v1"
+    assert reg.read_bytes()[8:48].rstrip(b"\0") == b"signed-three-band-backward80-v2"
     run(private, binary, "beacon-start", reg, start_sig, "start")
 
     # The deliberately inaccurate x = e_0/n has an exactly predictable score.
@@ -135,7 +138,7 @@ def check(base, binary, clock):
         (prover / str(rnd)).write_bytes(bytes.fromhex(sig))
     start_sig, end_sig = (str(rnd) for rnd in ROUNDS)
     check_three_band(base, binary, clock, prover / start_sig, prover / end_sig, tsa)
-    register = (binary, "beacon-register", "3d", "32", "alice", "nonce",
+    register = (binary, "fixture", "beacon-register", "3d", "32", "alice", "nonce",
                 start_sig, end_sig, "2000000000")
     run(prover, *register, "reg")
     run(prover, binary, "beacon-start", "reg", end_sig, "wrong-start", ok=False)
@@ -193,7 +196,7 @@ def check(base, binary, clock):
     (validator / "other-digest").write_bytes(bytes(32))
     run(validator, binary, "verify-beacon", "reg", "ca.pem", POLICY, "other-digest",
         "proof", ok=False)
-    run(prover, binary, "beacon-register", "signed3d", "32", "alice", "nonce", start_sig,
+    run(prover, binary, "fixture", "beacon-register", "signed3d", "32", "alice", "nonce", start_sig,
         end_sig, "2000000000", validator / "other-reg")
     run(prover, binary, "beacon-verify-stamp", validator / "other-reg", ca, POLICY,
         "start", "digest", tsa / "token", ok=False)
@@ -237,7 +240,7 @@ def check(base, binary, clock):
     ledger = base / "ledger"
     ledger.mkdir()
     future = 2 + (int(time.time()) - 1692803367) // 3 + 86400
-    run(prover, binary, "beacon-register", "3d", "32", "alice", "nonce", start_sig,
+    run(prover, binary, "fixture", "beacon-register", "3d", "32", "alice", "nonce", start_sig,
         str(future), "2000000000", "open-reg")
     run(prover, binary, "beacon-start", "open-reg", start_sig, "open-start")
     record = (binary, "beacon-record", "open-reg", ca, POLICY, "open-start")

@@ -13,5 +13,6 @@ int bc_check_evidence(const char *registration, const char *ca, const char *poli
                       const uint8_t start[RC_START_BYTES], const uint8_t digest[32],
                       const uint8_t finish_sig[BC_SIG_BYTES], const uint8_t *der,
                       size_t der_len, struct rc_info *info, uint64_t *uncertainty_ns);
+int bc_register_fixture(char **args);
 int bc_main(int argc, char **argv);
 #endif

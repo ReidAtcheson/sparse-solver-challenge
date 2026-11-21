@@ -460,6 +460,8 @@ static int report_wide(const struct rc_info *info, F energy, F x_squared,
            pass ? "pass" : "miss", info->finish_ns - info->start_ns);
     for (size_t i = 0; i < sizeof(info->attempt); ++i)
         printf("%02x", info->attempt[i]);
+    if (info->profile == matrix_profile_id(MATRIX_THREE_BAND_ID))
+        printf(" profile=%s", info->profile->id);
     puts("");
     OPENSSL_free(rho);
     OPENSSL_free(x2);
@@ -685,6 +687,8 @@ static int run_proof(const ProofJob *job)
     release_weights(v);
     if (creating)
         return 0;
+    if (info.profile != matrix_profile_id(MATRIX_THREE_BAND_ID))
+        fprintf(stderr, "replay of archived/test profile %s\n", info.profile->id);
     if (job->ca)
         printf("start_scheduled_ns=%" PRIu64 " commitment_utc_ns=%" PRIu64
                " clock_uncertainty_ns=%" PRIu64 "\n", info.start_ns, info.finish_ns, clock_error);
@@ -701,7 +705,16 @@ int main(int argc, char **argv)
     if (argc >= 2) {
         --argc;
         ++argv;
-        if (!strcmp(argv[0], "keygen") || matrix_profile_command(argv[0], 1) ||
+        /* Isolate historical issuance for the regression harnesses. Replays
+         * of existing signatures still select their authenticated generator. */
+        if (!strcmp(argv[0], "fixture") && argc >= 2) {
+            if (argc == 10 && !strcmp(argv[1], "beacon-register"))
+                return bc_register_fixture(argv + 2);
+            if (matrix_profile_command(argv[1], 1) && strcmp(argv[1], "start"))
+                return receipt_main(argc - 1, argv + 1);
+            return 2;
+        }
+        if (!strcmp(argv[0], "keygen") || !strcmp(argv[0], "start") ||
             !strcmp(argv[0], "stamp") || !strcmp(argv[0], "stamp-stdio"))
             return receipt_main(argc, argv);
         if (!strncmp(argv[0], "beacon-", 7))
@@ -729,8 +742,6 @@ int main(int argc, char **argv)
     }
     fputs("usage: stencil COMMAND ARGS\n"
           "  keygen SECRET PUBLIC\n  start SECRET ROWS ENTRY START  (three-band challenge)\n"
-          "  start2d | start3d | startsigned3d SECRET SIDE ENTRY START  (test fixtures)\n"
-          "  startblog SECRET ROWS ENTRY START  (fixed July comparison fixture)\n"
           "  solve PUBLIC START SOLUTION.f64\n  commit PUBLIC START SOLUTION.f64 ROWS DIGEST\n"
           "  stamp SECRET START DIGEST FINISH\n"
           "  stamp-stdio SECRET AUTHENTICATED_ENTRY < start-and-digest > finish\n"

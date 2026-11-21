@@ -406,10 +406,6 @@ int receipt_main(int argc, char **argv)
         return ok ? 0 : 1;
     }
     fprintf(stderr, "commands:\n  keygen SECRET PUBLIC\n  start SECRET N ENTRY START\n"
-                    "  start2d SECRET SIDE ENTRY START\n"
-                    "  start3d SECRET CUBE_SIDE ENTRY START\n"
-                    "  startsigned3d SECRET CUBE_SIDE ENTRY START\n"
-                    "  startblog SECRET ROWS ENTRY START\n"
                     "  stamp SECRET START DIGEST_FILE FINISH\n"
                     "  stamp-stdio SECRET AUTHENTICATED_ENTRY < request > finish\n");
     return 2;

@@ -9,7 +9,7 @@ The first sumcheck reduces the sum of squared residuals to a residual evaluated 
 ```text
 COMMIT(start, pinned_authority_key, private_solution_file):
     verify the signed start with the pinned key                          # Ed25519, RFC 8032
-    require profile "signed-three-band-backward80-v1"
+    require profile "signed-three-band-backward80-v2"
     m = start.side                        # signed field stores number of unknowns
     require m is a power of two in [1024, 65536]
     L = log2(m)

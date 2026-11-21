@@ -1,6 +1,6 @@
 # Interoperability for independent provers
 
-The default three-band challenge uses the wide `STNPRF02` wire layout for local receipts. Its signed profile ID selects the generator and numerical decision. A complete public example is archived with the cloud measurements. [Three-band specification](THREE_BAND_PROOF.md) · [Public replay](benchmarks/three-band-cloud/public)
+The default three-band challenge uses the wide `STNPRF02` wire layout for local receipts. Its signed profile ID selects the generator and numerical decision. A complete public example is archived with the end-to-end measurements. [Three-band specification](THREE_BAND_PROOF.md) · [Public replay](benchmarks/bounded-three-band/public)
 
 An entrant can implement the solver, commitment and prover in any language. The interface to the judge is the proof byte stream and the judge's preregistered public inputs. A prover can regenerate rows directly from the instance seed and keep its solution in memory. The row ordering, numerical encoding, commitment, transcript and acceptance equations determine interoperability. The signed 3D test profile has a complete worked transcript below. [Prover equations](PROVER.md) · [Validator equations](VALIDATOR.md) · [Public matrix and RHS generators](matrix.c)
 

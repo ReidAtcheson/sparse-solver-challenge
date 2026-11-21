@@ -3,9 +3,18 @@
 
 #include <errno.h>
 #include <fenv.h>
+#include <float.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+
+/* A seed identifies the same categorical draws across implementations.
+ * The Makefile also disables multiply-add contraction for this file. */
+_Static_assert(FLT_RADIX == 2 && DBL_MANT_DIG == 53 && DBL_MAX_EXP == 1024 &&
+               FLT_EVAL_METHOD == 0, "three-band seed replay requires binary64 evaluation");
+#ifdef __FAST_MATH__
+#error "three-band seed replay requires ordinary binary64 arithmetic"
+#endif
 
 struct tb_pattern {
     uint64_t seed;
@@ -65,13 +74,14 @@ static size_t band_boundary(size_t n, double center, int upper)
     return lo;
 }
 
-static size_t inlier_count(band b, size_t past, const size_t used[3], size_t draws)
+static size_t available(size_t first, size_t past, size_t row_past,
+                        const size_t used[3], size_t draws)
 {
-    size_t end = b.past < past ? b.past : past;
-    if (end <= b.first) return 0;
-    size_t count = end - b.first;
+    size_t end = past < row_past ? past : row_past;
+    if (end <= first) return 0;
+    size_t count = end - first;
     for (size_t k = 0; k < draws; ++k)
-        if (used[k] >= b.first && used[k] < end) --count;
+        if (used[k] >= first && used[k] < end) --count;
     return count;
 }
 
@@ -104,7 +114,7 @@ static void score_range(selection *s, size_t first, size_t past)
     }
 }
 
-static int scan_pattern(size_t n, uint64_t pattern_seed, tb_edge_fn visit, void *context)
+static int scan_pattern_v1(size_t n, uint64_t pattern_seed, tb_edge_fn visit, void *context)
 {
     counters incoming = {.n = n, .small = calloc(n, sizeof(uint8_t))};
     if (!incoming.small) return ENOMEM;
@@ -126,10 +136,10 @@ static int scan_pattern(size_t n, uint64_t pattern_seed, tb_edge_fn visit, void 
         size_t used[3], past = n-i;
         for (size_t k = 0; k < row_edge_count(n, i); ++k) {
             band b = bands[order[k]];
-            size_t inliers = inlier_count(b, past, used, k);
+            size_t inliers = available(b.first, b.past, past, used, k);
             if (!inliers) {
                 b = bands[0];
-                inliers = inlier_count(b, past, used, k);
+                inliers = available(b.first, b.past, past, used, k);
             }
             int tail = past-1-k > inliers && tb_rng_uniform(&rng) < 0.01;
             selection s = {.rng = &rng, .incoming = &incoming, .row = i,
@@ -157,6 +167,155 @@ static int scan_pattern(size_t n, uint64_t pattern_seed, tb_edge_fn visit, void 
 done:
     free(incoming.small);
     free(incoming.wide);
+    return error;
+}
+
+/* Each band has at most 401 integer offsets at distance <= 200. A column
+ * can receive at most one edge from each distinct predecessor, so 1203 is
+ * a conservative bound on incoming counts even when bands overlap. */
+enum { BAND_RADIUS = 200, BAND_WIDTH = 2 * BAND_RADIUS + 1, MAX_INCOMING = 3 * BAND_WIDTH };
+
+typedef struct {
+    size_t first, past, in_first, in_past;
+    double gaussian[BAND_WIDTH]; /* indexed relative to first */
+} bounded_band;
+
+/* These operations, including their order, are part of the bounded seed
+ * replay. Avoid platform-specific last bits of cbrt/pow/exp: a boundary
+ * offset or categorical draw can distinguish adjacent binary64 values. */
+static double bounded_extent(size_t n)
+{
+    double target = (double)n, lo = 1.0, hi = target;
+    for (;;) {
+        double mid = lo + (hi - lo) * 0.5;
+        if (mid == lo || mid == hi) return hi;
+        double cube = (mid * mid) * mid;
+        if (cube == target) return mid;
+        if (cube < target) lo = mid;
+        else hi = mid;
+    }
+}
+
+static double gaussian_weight(double deviation)
+{
+    double x = deviation / sigma;
+    double z = (-0.5 * (x * x)) * (1.0 / 16.0);
+    /* |z| < 0.83. Evaluate exp(z) through degree 17, then exp(z)^16. */
+    double sum = 1.0, term = 1.0;
+    for (unsigned k = 1; k <= 17; ++k) {
+        term = (term * z) / k;
+        sum += term;
+    }
+    for (unsigned k = 0; k < 4; ++k) sum *= sum;
+    return sum;
+}
+
+static void init_bounded_band(bounded_band *b, size_t n, double center)
+{
+    size_t middle = (size_t)center;
+    size_t first = middle > BAND_RADIUS ? middle - BAND_RADIUS : 1;
+    if ((double)first - center < -BAND_RADIUS) ++first;
+    b->first = first;
+    size_t past = middle + BAND_RADIUS + 1;
+    b->past = past < n ? past : n;
+    b->in_first = band_boundary(n, center, 0);
+    b->in_past = band_boundary(n, center, 1);
+    for (size_t off = b->first; off < b->past; ++off)
+        b->gaussian[off - b->first] = gaussian_weight((double)off - center);
+}
+
+typedef struct { size_t first, past; } interval;
+
+static size_t bounded_pick(const bounded_band *b, int tail, size_t row, size_t row_past,
+                           const size_t used[3], size_t draws, const uint16_t *incoming,
+                           size_t ring_mask, const double penalty[], tb_rng *rng)
+{
+    interval spans[2];
+    size_t nspan = 1;
+    if (tail) {
+        spans[0] = (interval){b->first, b->in_first};
+        spans[1] = (interval){b->in_past, b->past};
+        nspan = 2;
+    } else {
+        spans[0] = (interval){b->in_first, b->in_past};
+    }
+
+    uint16_t offsets[BAND_WIDTH], counts[BAND_WIDTH];
+    size_t count = 0;
+    unsigned min_incoming = MAX_INCOMING;
+    for (size_t range = 0; range < nspan; ++range) {
+        size_t end = spans[range].past < row_past ? spans[range].past : row_past;
+        for (size_t off = spans[range].first; off < end; ++off) {
+            if ((draws >= 1 && used[0] == off) || (draws >= 2 && used[1] == off)) continue;
+            unsigned load = incoming[(row + off) & ring_mask];
+            if (load < min_incoming) min_incoming = load;
+            counts[count] = (uint16_t)load;
+            offsets[count++] = (uint16_t)(off - b->first);
+        }
+    }
+    /* Subtract the minimum to keep at least one positive normal weight,
+     * including in tail intervals whose candidates all have high load. */
+    double cdf[BAND_WIDTH], total = 0;
+    size_t last_positive = 0;
+    for (size_t k = 0; k < count; ++k) {
+        double w = b->gaussian[offsets[k]] * penalty[counts[k] - min_incoming];
+        if (w > 0) last_positive = k;
+        total += w;
+        cdf[k] = total;
+    }
+    double target = tb_rng_uniform(rng) * total;
+    size_t lo = 0, hi = last_positive;
+    while (lo < hi) {
+        size_t mid = lo + (hi - lo) / 2;
+        if (cdf[mid] > target) hi = mid;
+        else lo = mid + 1;
+    }
+    return b->first + offsets[lo];
+}
+
+static int scan_pattern(size_t n, uint64_t pattern_seed, tb_edge_fn visit, void *context)
+{
+    double extent = bounded_extent(n);
+    bounded_band bands[3];
+    init_bounded_band(&bands[0], n, 1.0);
+    init_bounded_band(&bands[1], n, extent);
+    init_bounded_band(&bands[2], n, extent * extent);
+    size_t ring_size = 1;
+    while (ring_size < bands[2].past) ring_size *= 2;
+    uint16_t *incoming = calloc(ring_size, sizeof(*incoming));
+    if (!incoming) return ENOMEM;
+    size_t ring_mask = ring_size - 1;
+    double penalty[MAX_INCOMING + 1];
+    for (int k = 0; k <= MAX_INCOMING; ++k) penalty[k] = ldexp(1.0, -k);
+    tb_rng rng;
+    tb_rng_seed(&rng, pattern_seed);
+    int error = 0;
+    for (size_t row = 0; row < n-1; ++row) {
+        unsigned order[3];
+        tb_rng_permutation3(&rng, order);
+        /* No future selection can touch row itself. Every candidate lies
+         * less than ring_size ahead, so aliases are clear on first use. */
+        incoming[row & ring_mask] = 0;
+        size_t used[3], past = n - row;
+        for (size_t k = 0; k < row_edge_count(n, row); ++k) {
+            const bounded_band *b = &bands[order[k]];
+            size_t in = available(b->in_first, b->in_past, past, used, k);
+            if (!in) {
+                b = &bands[0];
+                in = available(b->in_first, b->in_past, past, used, k);
+            }
+            size_t all = available(b->first, b->past, past, used, k);
+            int tail = all > in && tb_rng_uniform(&rng) < 0.01;
+            size_t off = bounded_pick(b, tail, row, past, used, k,
+                                      incoming, ring_mask, penalty, &rng);
+            used[k] = off;
+            ++incoming[(row + off) & ring_mask];
+            error = visit(context, row, row + off);
+            if (error) goto done;
+        }
+    }
+done:
+    free(incoming);
     return error;
 }
 
@@ -217,8 +376,11 @@ static int sign_edge(void *context, size_t i, size_t j)
     return s->emit(s->context, i, j, tb_rng_sign(&s->signs));
 }
 
-int tb_signed_scan(size_t n, uint64_t pattern_seed, tb_sign_mode mode, uint64_t id,
-                   const size_t *perm, tb_entry_fn emit, void *context)
+typedef int (*pattern_scan_fn)(size_t, uint64_t, tb_edge_fn, void *);
+
+static int signed_scan(pattern_scan_fn scan, size_t n, uint64_t pattern_seed,
+                       tb_sign_mode mode, uint64_t id, const size_t *perm,
+                       tb_entry_fn emit, void *context)
 {
     if (n < 3 || !emit) return EINVAL;
     signed_stream s = {.emit = emit, .context = context};
@@ -227,13 +389,25 @@ int tb_signed_scan(size_t n, uint64_t pattern_seed, tb_sign_mode mode, uint64_t 
     if (err) return err;
     fenv_t saved;
     if (enter_round_to_nearest(&saved)) return EDOM;
-    err = scan_pattern(n, pattern_seed, sign_edge, &s);
+    err = scan(n, pattern_seed, sign_edge, &s);
     for (size_t k = 0; !err && k < n; ++k) {
         size_t row = perm ? perm[k] : k;
         err = emit(context, row, row, tb_rng_sign(&s.signs));
     }
     if (fesetenv(&saved)) return EDOM;
     return err;
+}
+
+int tb_signed_scan(size_t n, uint64_t pattern_seed, tb_sign_mode mode, uint64_t id,
+                   const size_t *perm, tb_entry_fn emit, void *context)
+{
+    return signed_scan(scan_pattern, n, pattern_seed, mode, id, perm, emit, context);
+}
+
+int tb_signed_scan_v1(size_t n, uint64_t pattern_seed, tb_sign_mode mode, uint64_t id,
+                      const size_t *perm, tb_entry_fn emit, void *context)
+{
+    return signed_scan(scan_pattern_v1, n, pattern_seed, mode, id, perm, emit, context);
 }
 
 static int cache_edge(void *context, size_t i, size_t j)

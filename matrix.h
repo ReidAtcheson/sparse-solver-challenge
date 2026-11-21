@@ -11,6 +11,7 @@ typedef struct {
     int signed_unit;
     uint64_t horizontal_key, vertical_key, depth_key, rhs_key;
     uint64_t pattern_seed, sign_seed;
+    int legacy_three_band;       /* exact pre-cap stream for archived receipts */
     /* Optional indexed three-band representation. Entries encode
      * (column << 1) | (coefficient < 0) in sorted column order. */
     uint32_t *offsets, *entries;
@@ -33,7 +34,8 @@ typedef struct {
 #define MATRIX_PROFILE_3D_ID "seeded-stencil-3d-exact-residual-v1"
 #define MATRIX_SIGNED3D_ID "signed-unit-torus-3d-backward80-v2"
 #define MATRIX_BLOG_ID "july-tridiagonal-fixed-nonce-80-v1"
-#define MATRIX_THREE_BAND_ID "signed-three-band-backward80-v1"
+#define MATRIX_THREE_BAND_ID "signed-three-band-backward80-v2"
+#define MATRIX_THREE_BAND_V1_ID "signed-three-band-backward80-v1"
 enum { MATRIX_ID_BYTES = 40 };
 typedef struct matrix_profile {
     char id[MATRIX_ID_BYTES];  /* canonical zero-padded wire bytes */

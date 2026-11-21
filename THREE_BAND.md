@@ -1,4 +1,4 @@
-# Signed three-band matrices
+# Bounded signed three-band matrices
 
 `stencil three-band` generates a symmetric matrix with a seeded sparsity pattern and independent edge and diagonal signs. Vertices retain their original indices. The dimension can be any integer at least three. A pattern has exactly `3*n - 6` strict-upper entries. With the diagonal and both triangles, the matrix has `7*n - 12` nonzeros. All entries are real binary64 values of +1 or −1. Singular samples pass through as drawn.
 
@@ -27,12 +27,13 @@ The public C library provides `tb_pattern_create` and `tb_signed_matrix` for the
 
 ## Replay rules
 
-- Set `extent = np.cbrt(n)`. The three offset centers are `1`, `extent`, and `extent**2`. All bands have fixed width `sigma = 100 / NormalDist().inv_cdf(0.995)`, approximately 38.8224483 indices. The inlier condition is strictly `abs(offset - center) < 100`.
-- The pattern starts with `default_rng(pattern_seed)`. Visit rows up to and including `n-2`. Permute all three bands, use the first `min(3,n-1-i)`, and exclude columns already chosen in that row. Fall back to the center at 1 whenever a band has no available inliers. Draw the 1% tail-selection Bernoulli only when available tail columns exist.
-- Within the selected set maximize `-0.5*((offset-center)/sigma)**2 - incoming[j]*log(2) + gumbel[j]`, breaking ties by smallest column. Each draw consumes standard Gumbels for **every** future column in increasing order, including previously selected and masked columns. After each selection increment that column's counter. The C code omits the logarithms for masked spans while consuming the same random stream.
-- For a draw ID, initialize the sign generator with `default_rng([n, pattern_seed, sign_draw, 7531])`. For a separate scalar seed use `default_rng(sign_seed)`. Draw all edge signs in edge-draw order, followed by all diagonal signs. A historical permutation is a zero-based list with `perm[k]` equal to the original vertex at METIS position `k`. Assign `diag_original[perm[k]] = diag_draw[k]`. It affects only diagonal placement. The CLI accepts the list as whitespace-separated integers in a file, or from standard input with `--perm -`. Fresh samples default to original diagonal order.
+For each row $i$, visit the three bands in a fresh random permutation. Their offset centers $\mu$ are $1$, $n^{1/3}$ and $n^{2/3}$. Keep only strict-upper columns $j>i$, excluding columns already chosen in this row. Visit at most three bands and stop after $n-1-i$ selections in the final short rows.
 
-The native and Python versions were compared on this host with NumPy 2.3.5, including cube and noncube sizes and seeds above 32 bits. Floating-point math libraries and NumPy CPU dispatch can change last-bit results in the centers, thresholds or scores. The replay tests include the complete ordered-edge digest for `n=1331, pattern_seed=42` as a portability check. [Replay vectors](tests/three_band_reference.py) · [NumPy compatibility policy](https://numpy.org/doc/2.3/reference/random/compatibility.html)
+1. For offset $t=j-i$, define $d=t-\mu$. Inliers have $|d|<100$. Tail offsets have $100\le|d|\le200$. If the band has no available inliers, switch to the band centered at 1 and recompute both sets. The boundary at 200 is inclusive.
+2. If tail candidates exist, consume one uniform draw and choose the tail when it is below 0.01. Otherwise use the inliers. Thus 1% is the total probability of selecting either tail when available. The two tails share the same weighted selection.
+3. Within the chosen set the target weight is $\exp(-d^2/(2\sigma^2))2^{-c_j}$, where $c_j$ counts earlier incoming edges and $\sigma=100/\Phi^{-1}(0.995)$. Enumerate eligible offsets in increasing order. Subtract the smallest eligible count from every $c_j$ before applying the power of two. Accumulate the binary64 weights left to right. Consume one uniform $U$, even for a singleton, and select the first cumulative weight strictly greater than $U$ times the total. If rounding lands on the upper endpoint, select the last candidate with positive weight. Emit the edge, increment its count, and exclude it from further selections in the row.
+4. The pattern stream uses the NumPy 2.3.5 `default_rng(pattern_seed)` permutation and binary64 uniform schedules. The protocol fixes the operation order for the cube root and Gaussian weights so independent implementations can regenerate the exact columns. The reference evaluates the exponential through degree 17 after dividing its argument by 16, then squares four times. See `band_centers` and `gaussian_weight` for the complete binary64 recipe. The replay tests pin ordered edges for cube and noncube dimensions. [Python reference](examples/three_band_reference.py) · [Known answers](tests/three_band_reference.py)
+5. For raw sign-draw experiments, seed the sign generator with `default_rng([n, pattern_seed, sign_draw, 7531])`. For the challenge, use `default_rng(sign_seed)`. Draw all edge signs in edge-draw order, followed by all diagonal signs in original index order. A supplied permutation for a historical sign experiment maps `perm[k]` to the original vertex at position `k`; assign `diagonal_original[perm] = diagonal_draw`.
 
 ```sh
 make check-three-band
@@ -41,28 +42,6 @@ make check-three-band-reference PYTHON=/path/to/numpy-2.3.5-scipy/bin/python
 
 ## Cost and challenge registration
 
-The pattern scan consumes exactly `3*n*(n-1)/2 - 4` standard Gumbels for every valid dimension. At 1,048,576 rows that is about 1.65 trillion Gumbels, even with only 3,145,722 undirected edges. Each row can select a far-future column. The C scanner starts with one byte per column and widens its counters if any would overflow. Working memory is linear in `n`. Caching edges for reuse or returning a complete CSR/CSC matrix also takes linear storage. Once the pattern is cached, signing and sparse assembly take linear time.
+A band spans at most 401 integer offsets. With at most three selections per row, the total number of weighted candidates examined is linear in $n$. The streaming C generator keeps incoming counts in a power-of-two ring covering the furthest possible future neighbor, at most $\lfloor n^{2/3}\rfloor+200$ places ahead (using the protocol's computed center). A column can have at most $3\times401$ distinct predecessor offsets, so a 16-bit counter suffices for every seed. The scanner uses $O(n^{2/3}+200)$ temporary space. Materializing a CSR or CSC matrix takes $O(n)$ space. [Pattern timings and held-out ordering results](benchmarks/BOUNDED_PATTERN.md)
 
-The default registered challenge uses `signed-three-band-backward80-v1` and powers of two from 1,024 through 65,536 rows. The upper limit guarantees that every possible draw meets the current proof profile's absolute row-sum budget. The raw sampler above accepts other dimensions. Fresh challenges derive a 32-byte instance seed from the signed start under the chosen receipt protocol. Read it as four little-endian unsigned 64-bit words $s_0,s_1,s_2,s_3$. Use $s_0$ as the pattern seed and $s_1$ as the independent sign seed, with the diagonal assigned in original order. Set $k=\operatorname{mix}(s_2\mathbin{\oplus}\operatorname{mix}(s_3))$ using the SplitMix64 finalizer in `matrix.c`. The RHS for row $i$ is $+1/n$ when the high bit of $\operatorname{mix}(k+i)$ is set and $-1/n$ otherwise. Addition wraps at 64 bits. [Numerical score and proof bounds](THREE_BAND_PROOF.md) · [C implementation](matrix.c)
-
-## Symbolic ordering experiment
-
-For 4,096 vertices, the table gives the structural nonzeros in the lower factor, including its diagonal. The seed-42 column reuses exactly one METIS permutation for every graph. The fresh column computes a METIS permutation from each graph. CHOLMOD used the specified permutations with postordering disabled. Numerical values and indefinite pivoting do not enter this measurement.
-
-| Pattern seed | Natural index order | Seed-42 METIS | Fresh METIS | Seed-42 / fresh |
-|---:|---:|---:|---:|---:|
-| 42 | 847,087 | 665,288 | 665,288 | 1.00 |
-| 43 | 848,295 | 1,871,011 | 665,645 | 2.81 |
-| 44 | 845,409 | 1,855,574 | 646,694 | 2.87 |
-| 45 | 846,430 | 1,920,469 | 654,367 | 2.93 |
-
-The permutation specialized to seed 42 transferred poorly. Natural order cost 1.27–1.31 times as many factor entries as fresh METIS on these three held-out patterns. This experiment measures the complete recipe. Isolating the effect of the 1% tail would require a matched experiment varying that feature.
-
-To reproduce, use a SuiteSparse installation with CHOLMOD and METIS support. Adjust the include path for the local installation. [Benchmark source](benchmarks/three_band_ordering.c)
-
-```sh
-cc -std=c11 -O3 -ffp-contract=off -I/usr/include/suitesparse \
-   benchmarks/three_band_ordering.c three_band.c three_band_rng.c \
-   -lcholmod -lm -o /tmp/three-band-ordering
-/tmp/three-band-ordering
-```
+The sole competition profile is `signed-three-band-backward80-v2`. It accepts powers of two from 1,024 through 65,536 rows within the current proof bounds. The standalone generator also supports other sizes. Fresh challenges derive a 32-byte instance seed from the signed start under the chosen receipt protocol. Read it as four little-endian unsigned 64-bit words $s_0,s_1,s_2,s_3$. Use $s_0$ as the pattern seed and $s_1$ as the independent sign seed, with the diagonal assigned in original order. Set $k=\operatorname{mix}(s_2\mathbin{\oplus}\operatorname{mix}(s_3))$ using the SplitMix64 finalizer in `matrix.c`. The RHS for row $i$ is $+1/n$ when the high bit of $\operatorname{mix}(k+i)$ is set and $-1/n$ otherwise. Addition wraps at 64 bits. [Numerical score and proof bounds](THREE_BAND_PROOF.md) · [C implementation](matrix.c)

@@ -89,7 +89,7 @@ def baseline_size(binary, side, work):
     with tempfile.TemporaryDirectory(dir=work) as path:
         p = Path(path)
         run(binary, p, "keygen", "sk", "pk")
-        run(binary, p, "start3d", "sk", side, "legacy-size", "start")
+        run(binary, p, "fixture", "start3d", "sk", side, "legacy-size", "start")
         run(binary, p, "solve", "pk", "start", "x")
         run(binary, p, "commit", "pk", "start", "x", "rows", "digest")
         run(binary, p, "stamp", "sk", "start", "digest", "finish")
@@ -112,7 +112,7 @@ def regression(binary, side, validator, private):
         (validator / "changed").write_bytes(changed)
         run(binary, validator, "verify", "pk", "changed", "start", status=1)
     (validator / "changed").unlink()
-    run(binary, private, "startsigned3d", "sk", side, "zero-vector", "zero-start")
+    run(binary, private, "fixture", "startsigned3d", "sk", side, "zero-vector", "zero-start")
     with (private / "zero-x").open("wb") as f:
         f.truncate(8 * m)
     run(binary, private, "commit", "pk", "zero-start", "zero-x", "zero-rows", "zero-digest")
@@ -140,7 +140,7 @@ def trial(args, helper, p, case, checkpoint, baseline, check_regression):
         return measure(helper, [program, *map(str, args_)], cwd, env, case, name, checkpoint)
 
     stage("keygen", "keygen", "sk", "pk")
-    stage("start", "startsigned3d", "sk", side, f"signed-{side}-{number}", "start")
+    stage("start", "fixture", "startsigned3d", "sk", side, f"signed-{side}-{number}", "start")
     start = (p / "start").read_bytes()
     if start[88:128].rstrip(b"\0") != PROFILE:
         raise ValueError("unexpected profile")

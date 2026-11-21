@@ -287,7 +287,7 @@ int solve_main(int argc, char **argv)
     }
     size_t n = (size_t)rows;
     Matrix a = info.profile->initialize(info.side, info.seed);
-    if (info.profile == matrix_profile_id(MATRIX_THREE_BAND_ID))
+    if (info.dimensions == 1 && info.signed_unit)
         return solve_three_band(&a, n, argv[3]) ? 0 : 1;
     if (info.profile == matrix_profile_id(MATRIX_BLOG_ID))
         return solve_blog(&a, n, argv[3]) ? 0 : 1;

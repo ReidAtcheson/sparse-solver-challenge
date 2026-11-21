@@ -1,0 +1,292 @@
+{
+  "profile": "signed-three-band-backward80-v2",
+  "machine": {
+    "kernel": "7.2.6-76070206-generic",
+    "architecture": "x86_64",
+    "cpu": "13th Gen Intel(R) Core(TM) i7-1360P",
+    "vcpus": 16,
+    "affinity_vcpus": 16,
+    "memtotal_kib": 65679624,
+    "scratch_filesystem": "ext4",
+    "scratch_free_bytes_at_start": 3242427789312,
+    "cgroup_memory_limit": null,
+    "cgroup_cpu_limit": null
+  },
+  "solver_threads": 1,
+  "receipt_provider": "local Ed25519",
+  "binary_sha256": "36c973c54d3a22e34374f7b07a0984fbe28f3ba3b67731f015c28377d7c202ca",
+  "solver_sha256": "94110b5f72c2ca3ff50ecca8315314d8c9bbb5f619cd7af4b9aac75b34cc93e0",
+  "runs": [
+    {
+      "rows": 1024,
+      "nnz": 7156,
+      "trial": 1,
+      "status": "complete",
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.031252586,
+          "peak_rss_kib": 6220
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.03259046,
+          "peak_rss_kib": 6556
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.032686682,
+          "peak_rss_kib": 12656,
+          "stderr": "generation_seconds=0.001149620 solve_seconds=0.022758107"
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.024815776,
+          "peak_rss_kib": 6448
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.032906947,
+          "peak_rss_kib": 6468
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.030725827,
+          "peak_rss_kib": 6700
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.021856755000000002,
+          "peak_rss_kib": 6692,
+          "stdout": "certified rows=1024 exponent=-3 rho=47813243774697472 x_squared=3452816260127007237721021800513930214647516889088 relative_rhs=2.893972725248799e-15 backward_2_upper=4.384022746497738e-17 target=pass elapsed_ns=99527314 attempt=d96ba4d61428831bf2ffeea22508a6f09ddbc5a581f57b14d6d0ab3f5a83f2ca profile=signed-three-band-backward80-v2"
+        },
+        "stream_matrix_market": {
+          "exit_status": 0,
+          "wall_s": 0.0044021120000000006,
+          "peak_rss_kib": 4132
+        }
+      },
+      "seed_hex": "c3664c27dcb1346d9f0cb0b808ace5cb187022afc23ffe37919811d5392c8b53",
+      "public_key_hex": "6de1057fb3323ba405ed3f55025751c6bdfc26c6efbd71b16ccf02c1a493aba4",
+      "start_receipt_hex": "53544e535441303100040000000000006154a27b2c25ea18a5fb84f2065e0cf6da26330aedb9343bb7e83cf4e36b78fd06cd75225146a53b46b3c7371535c131eecfd83408a1b6ebebb67e3b5b5bedd3056a122dcd712b187369676e65642d74687265652d62616e642d6261636b7761726438302d7632000000000000000000168784527aa8e7326a095baad5021d6fca65bfe44f2f5c051bc8ab807f8452681e383faf29b4b8c29e7cc323c946e164559218ad99faf33e6e81f892269d6508",
+      "verified": {
+        "rows": "1024",
+        "exponent": "-3",
+        "rho": "47813243774697472",
+        "x_squared": "3452816260127007237721021800513930214647516889088",
+        "relative_rhs": "2.893972725248799e-15",
+        "backward_2_upper": "4.384022746497738e-17",
+        "target": "pass",
+        "elapsed_ns": "99527314",
+        "attempt": "d96ba4d61428831bf2ffeea22508a6f09ddbc5a581f57b14d6d0ab3f5a83f2ca",
+        "profile": "signed-three-band-backward80-v2"
+      },
+      "proof_bytes": 5836,
+      "proof_sha256": "7e0d747ab7e32bbbd75a240b2cb8911dce056fe3b8f37601a4d988c42281447a"
+    },
+    {
+      "rows": 4096,
+      "nnz": 28660,
+      "trial": 1,
+      "status": "complete",
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.031745351000000005,
+          "peak_rss_kib": 6360
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.029091339,
+          "peak_rss_kib": 6304
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 0.7631613380000001,
+          "peak_rss_kib": 80588,
+          "stderr": "generation_seconds=0.004609730 solve_seconds=0.747129383"
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.026932861000000002,
+          "peak_rss_kib": 6436
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.027030385,
+          "peak_rss_kib": 6184
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.03671564,
+          "peak_rss_kib": 6936
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.02948546,
+          "peak_rss_kib": 6780,
+          "stdout": "certified rows=4096 exponent=-4 rho=331044095600885760 x_squared=22981572545814142519550392001091578625687787470848 relative_rhs=7.6148833115593369e-15 backward_2_upper=4.5103983473178033e-17 target=pass elapsed_ns=829143283 attempt=ca35087c056e82582866c1a4244874707bc38fce4607fbb6f9a3b3abc0f8b4f3 profile=signed-three-band-backward80-v2"
+        },
+        "stream_matrix_market": {
+          "exit_status": 0,
+          "wall_s": 0.007477162000000001,
+          "peak_rss_kib": 4140
+        }
+      },
+      "seed_hex": "2947d20cae6df91602f03fca563da8bef3f21733a6b7579217623dd5265371df",
+      "public_key_hex": "f99c1eca5afee0e3e5da654e2968759371195b7288355561aea9bc1102a41d65",
+      "start_receipt_hex": "53544e5354413031001000000000000067ab158a2c25ea18047844374db3eab96768f0964290f67b0083f7727ade79875cb9903db680cff8ca524e7777666540aed77c53088f3d0dd729d20e2c22dbe363a0c0098f991c157369676e65642d74687265652d62616e642d6261636b7761726438302d763200000000000000000096f9bf40880d844ccd15e9a6d6a33abbebb21356fd1571293a8c52791b082ddad33c3fbbc983ff4f66ca21b58cccff224dd8fed9673fb2508c7b10bc0b6f8a02",
+      "verified": {
+        "rows": "4096",
+        "exponent": "-4",
+        "rho": "331044095600885760",
+        "x_squared": "22981572545814142519550392001091578625687787470848",
+        "relative_rhs": "7.6148833115593369e-15",
+        "backward_2_upper": "4.5103983473178033e-17",
+        "target": "pass",
+        "elapsed_ns": "829143283",
+        "attempt": "ca35087c056e82582866c1a4244874707bc38fce4607fbb6f9a3b3abc0f8b4f3",
+        "profile": "signed-three-band-backward80-v2"
+      },
+      "proof_bytes": 8140,
+      "proof_sha256": "413049b6dc24ba823823cf2ad2b7c79cfadaf9b7cae2fdea659226c75bbe93a7"
+    },
+    {
+      "rows": 8192,
+      "nnz": 57332,
+      "trial": 1,
+      "status": "complete",
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.031107708,
+          "peak_rss_kib": 6368
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.029778197000000003,
+          "peak_rss_kib": 6440
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 5.873261268,
+          "peak_rss_kib": 254392,
+          "stderr": "generation_seconds=0.013404173 solve_seconds=5.849373492"
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.042578910000000005,
+          "peak_rss_kib": 6408
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.032755658,
+          "peak_rss_kib": 6312
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.045636996000000006,
+          "peak_rss_kib": 6956
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.04722943,
+          "peak_rss_kib": 6644,
+          "stdout": "certified rows=8192 exponent=-5 rho=335108696348557312 x_squared=21105307489848972184358293403138334382139149123584 relative_rhs=5.4174907797286836e-15 backward_2_upper=4.7216276717011189e-17 target=pass elapsed_ns=5960425509 attempt=d478cfbf887af4c515b63a1d930505f16ca98e4f2585c0c69db14a51f2ab1ea5 profile=signed-three-band-backward80-v2"
+        },
+        "stream_matrix_market": {
+          "exit_status": 0,
+          "wall_s": 0.009727383000000001,
+          "peak_rss_kib": 3948
+        }
+      },
+      "seed_hex": "942b35a671dc7c9f6727fecd8da7cdfa7cff48bf5f48e9ae41fa685cc4de4077",
+      "public_key_hex": "15a4a051bff0d73dd746974d93b6f28c6b8c53bdbcb302b73d6d7fc78b6b349b",
+      "start_receipt_hex": "53544e53544130310020000000000000b0e498c42c25ea18e45a7b1a493e30caeb2fe386393fefb06983c3bce7bcd9376e6c126b190e4baf1dea703d5805783ae530f18a4ce3cdb64a11f90a19575b84492a2997c9b58fec7369676e65642d74687265652d62616e642d6261636b7761726438302d7632000000000000000000ef621e0249d7c3a030a3aa940bf66fa740e676aa5bef6cc6c2b5ca5de006914c5259d033c491862e8ad049577726a8a1d2478ea44ebbdf90757098e556940802",
+      "verified": {
+        "rows": "8192",
+        "exponent": "-5",
+        "rho": "335108696348557312",
+        "x_squared": "21105307489848972184358293403138334382139149123584",
+        "relative_rhs": "5.4174907797286836e-15",
+        "backward_2_upper": "4.7216276717011189e-17",
+        "target": "pass",
+        "elapsed_ns": "5960425509",
+        "attempt": "d478cfbf887af4c515b63a1d930505f16ca98e4f2585c0c69db14a51f2ab1ea5",
+        "profile": "signed-three-band-backward80-v2"
+      },
+      "proof_bytes": 10316,
+      "proof_sha256": "7bf857a5b4b8922f5ecdc6476fb839da85e57684e6168dfe625f0882d9843a9d"
+    },
+    {
+      "rows": 16384,
+      "nnz": 114676,
+      "trial": 1,
+      "status": "complete",
+      "stages": {
+        "keygen": {
+          "exit_status": 0,
+          "wall_s": 0.025708806,
+          "peak_rss_kib": 6116
+        },
+        "start": {
+          "exit_status": 0,
+          "wall_s": 0.030187838,
+          "peak_rss_kib": 6628
+        },
+        "solve": {
+          "exit_status": 0,
+          "wall_s": 62.294776755,
+          "peak_rss_kib": 901556,
+          "stderr": "generation_seconds=0.021558433 solve_seconds=62.260325044"
+        },
+        "commit": {
+          "exit_status": 0,
+          "wall_s": 0.038947401,
+          "peak_rss_kib": 6308
+        },
+        "stamp": {
+          "exit_status": 0,
+          "wall_s": 0.027064761000000003,
+          "peak_rss_kib": 6420
+        },
+        "prove": {
+          "exit_status": 0,
+          "wall_s": 0.06962349100000001,
+          "peak_rss_kib": 7076
+        },
+        "verify": {
+          "exit_status": 0,
+          "wall_s": 0.06503602900000001,
+          "peak_rss_kib": 6760,
+          "stdout": "certified rows=16384 exponent=-5 rho=441441466726744064 x_squared=29308052588685250163227583862118738165547282726912 relative_rhs=8.7934012860033381e-15 backward_2_upper=4.6145749580392821e-17 target=pass elapsed_ns=62375337431 attempt=6d1fc05e201068632979577bc6aa03f9c2ddfffa3310454c5a2415c616282b74 profile=signed-three-band-backward80-v2"
+        },
+        "stream_matrix_market": {
+          "exit_status": 0,
+          "wall_s": 0.01959494,
+          "peak_rss_kib": 3932
+        }
+      },
+      "seed_hex": "51026c284181361a3308537650ba0e6ef0ca922de2a2ff9d888d2ca80cf423d3",
+      "public_key_hex": "13cc2b06f8e3e300ebefcebf7dea25264a261baebd92e1cb7f0c5f8f6b37ab9f",
+      "start_receipt_hex": "53544e535441303100400000000000009cc497322e25ea18e5f3f28c97a584c16c75268a4ebb778f166bd468b46de956654e2d1186641cc1d3e4f890aed31327191bcca25a13c51e1129020fc1322b5f4785c5e83929a91b7369676e65642d74687265652d62616e642d6261636b7761726438302d763200000000000000000013f9b20735f1dc3301f53a8b667bef32955dbc0cb5ae73e0cae63e339eaf1465df4bde448feef035d1e29539d81d11392e402a7aa0c952fac35746142fc7380a",
+      "verified": {
+        "rows": "16384",
+        "exponent": "-5",
+        "rho": "441441466726744064",
+        "x_squared": "29308052588685250163227583862118738165547282726912",
+        "relative_rhs": "8.7934012860033381e-15",
+        "backward_2_upper": "4.6145749580392821e-17",
+        "target": "pass",
+        "elapsed_ns": "62375337431",
+        "attempt": "6d1fc05e201068632979577bc6aa03f9c2ddfffa3310454c5a2415c616282b74",
+        "profile": "signed-three-band-backward80-v2"
+      },
+      "proof_bytes": 12492,
+      "proof_sha256": "3d8bf44a1c177d3e4494aa509001494ac206ee020e85c85f77fda89db968f9ca"
+    }
+  ],
+  "superlu_version": "6.0.1",
+  "compiler": "cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "blas_library": "/usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3"
+}

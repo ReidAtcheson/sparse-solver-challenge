@@ -9,8 +9,16 @@ _Static_assert(sizeof(MATRIX_PROFILE_ID) <= MATRIX_ID_BYTES &&
                sizeof(MATRIX_PROFILE_3D_ID) <= MATRIX_ID_BYTES &&
                sizeof(MATRIX_SIGNED3D_ID) <= MATRIX_ID_BYTES &&
                sizeof(MATRIX_THREE_BAND_ID) <= MATRIX_ID_BYTES &&
+               sizeof(MATRIX_THREE_BAND_V1_ID) <= MATRIX_ID_BYTES &&
                sizeof(MATRIX_BLOG_ID) <= MATRIX_ID_BYTES, "profile must fit the signed receipt");
 static Matrix three_band(uint32_t n, const uint8_t seed[32]);
+
+static Matrix three_band_v1(uint32_t n, const uint8_t seed[32])
+{
+    Matrix matrix = three_band(n, seed);
+    matrix.legacy_three_band = 1;
+    return matrix;
+}
 
 static Matrix diffusion3d(uint32_t side, const uint8_t seed[32])
 {
@@ -24,11 +32,12 @@ static Matrix july_fixture(uint32_t side, const uint8_t seed[32])
 }
 
 static const MatrixProfile profiles[] = {
-    /* Simple graph: at most n unit terms in any row, for every seed. The
-     * protocol's absolute row-sum budget limits the largest registered n. */
+    /* Sole active challenge. Keep the audited size and integer score envelope. */
     {MATRIX_THREE_BAND_ID, "three-band", "start", 1, 1, MATRIX_ABS_ROW_LIMIT,
      1024, MATRIX_ABS_ROW_LIMIT, 1, three_band},
-    /* Fixture identifiers are retained for replay and regression tests. */
+    /* Preserve historical generators only for authenticated replay and tests. */
+    {MATRIX_THREE_BAND_V1_ID, "three-band-v1", "startbandv1", 1, 1, MATRIX_ABS_ROW_LIMIT,
+     1024, MATRIX_ABS_ROW_LIMIT, 1, three_band_v1},
     {MATRIX_PROFILE_ID, "2d", "start2d", 2, 0, 5, 512, 32768, 1, matrix_init},
     {MATRIX_PROFILE_3D_ID, "3d", "start3d", 3, 0, 7, 32, 1024, 1, diffusion3d},
     {MATRIX_SIGNED3D_ID, "signed3d", "startsigned3d", 3, 1, 7, 32, 1024, 1, matrix_init_signed3d},
@@ -61,6 +70,9 @@ const MatrixProfile *matrix_profile_command(const char *name, int local_start)
 
 const MatrixProfile *matrix_profile_kind(unsigned dimensions, int signed_unit)
 {
+    /* Old receipt provider plugins could describe the v1 three-band profile
+     * using only these two fields. New providers must return v2 explicitly. */
+    if (dimensions == 1 && signed_unit) return matrix_profile_id(MATRIX_THREE_BAND_V1_ID);
     const MatrixProfile *found = NULL;
     for (unsigned i = 0; i < PROFILE_COUNT; i++) {
         if (profiles[i].dimensions == dimensions && profiles[i].signed_unit == signed_unit) {
@@ -116,6 +128,9 @@ int matrix_three_band_scan(const Matrix *a,
                            int (*emit)(void *, size_t, size_t, int), void *context)
 {
     if (!a || a->dimensions != 1 || !a->signed_unit || !emit) return EINVAL;
+    if (a->legacy_three_band)
+        return tb_signed_scan_v1(a->side, a->pattern_seed, TB_SIGN_SEED, a->sign_seed,
+                                 NULL, emit, context);
     return tb_signed_scan(a->side, a->pattern_seed, TB_SIGN_SEED, a->sign_seed,
                           NULL, emit, context);
 }

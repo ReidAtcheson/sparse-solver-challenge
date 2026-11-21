@@ -242,14 +242,19 @@ static int verify_submission(char **a, const char *ledger)
                   info.start_ns, info.finish_ns, error) >= 0;
 }
 
+/* Called only by the CLI's fixture subcommand. */
+int bc_register_fixture(char **args)
+{
+    const MatrixProfile *p = matrix_profile_command(args[0], 0);
+    return p && p != matrix_profile_id(MATRIX_THREE_BAND_ID) && registration(p, args + 1) ? 0 : 1;
+}
+
 int bc_main(int argc, char **argv)
 {
     int ok;
-    if (!strcmp(argv[0], "beacon-register") && (argc == 8 || argc == 9)) {
-        const MatrixProfile *p = argc == 8 ? matrix_profile_id(MATRIX_THREE_BAND_ID) :
-                                             matrix_profile_command(argv[1], 0);
-        ok = registration(p, argv + (argc == 8 ? 1 : 2));
-    }
+    if (!strcmp(argv[0], "beacon-register") &&
+        (argc == 8 || (argc == 9 && !strcmp(argv[1], "three-band"))))
+        ok = registration(matrix_profile_id(MATRIX_THREE_BAND_ID), argv + (argc == 8 ? 1 : 2));
     else if (!strcmp(argv[0], "beacon-start") && argc == 4)
         ok = start_receipt(argv);
     else if (!strcmp(argv[0], "beacon-query") && (argc == 5 || argc == 6))

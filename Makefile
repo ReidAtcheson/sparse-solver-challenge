@@ -39,7 +39,7 @@ libstencil.so: $(library_objects) $(BLST_LIB)
 drand.o: .stencil-blst-config
 $(objects): Makefile
 
-# NumPy rounds the individual arithmetic operations in its Gumbel scores.
+# Replay uses individually rounded binary64 operations in both sampler versions.
 three_band.o: CFLAGS += -ffp-contract=off
 tests/check-three-band-rng: tests/three_band_rng.c three_band_rng.o
 	$(CC) $(filter-out -MMD -MP,$(CFLAGS)) $(LDFLAGS) $^ -lm -o $@

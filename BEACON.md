@@ -13,7 +13,7 @@ make BLST_DIR=/absolute/path/to/blst
 make BLST_DIR=/absolute/path/to/blst check
 ```
 
-Before the start, the judge fixes the profile, size, entrant label, a 32-byte registration nonce, two future round numbers, an allowed TSA trust bundle and numerical policy OID. It also sets a nonzero clock error allowance in nanoseconds based on that TSA's accuracy policy and the registrar's clock. The proof round acts as the deadline for recording a commitment. Choose it far enough after the start to allow the solve, commitment, timestamp and delivery to the registrar.
+Before the start, the judge registers the bounded three-band profile, row count, entrant label, a 32-byte registration nonce, two future round numbers, an allowed TSA trust bundle and numerical policy OID. It also sets a nonzero clock error allowance in nanoseconds based on that TSA's accuracy policy and the registrar's clock. The proof round acts as the deadline for recording a commitment. Choose it far enough after the start to allow the solve, commitment, timestamp and delivery to the registrar.
 
 ```sh
 # Judge. Publish the exact registration and trust settings before START_ROUND.
@@ -102,4 +102,4 @@ The security argument assumes the signatures are unpredictable before their sche
 
 ## Offline reference check
 
-`make BLST_DIR=/absolute/path/to/blst check-beacon` exercises both the diffusion and signed-unit 3D profiles with archived, genuine Quicknet signatures and a locally issued RFC 3161 test response. In one signed 32³ run the transcript occupied 17,552 bytes, including a 912-byte response, and certified a joint backward error of `1.7897962026112965e-17`. The 262,144-byte solution stayed with the prover. DER length varies with the test certificates and signatures. These historical fixtures test verification and interoperability. Separate live-issued FreeTSA and Sigstore receipts over a known digest are available for offline replay. [Public receipt examples](PUBLIC_TIMESTAMPS.md#verify-a-real-stamp-in-a-fresh-checkout) [End-to-end tests](tests/check_beacon.py)
+`make BLST_DIR=/absolute/path/to/blst check-beacon` exercises the bounded three-band challenge and historical test profiles with archived, genuine Quicknet signatures and a locally issued RFC 3161 test response. In one signed 32³ run the transcript occupied 17,552 bytes, including a 912-byte response, and certified a joint backward error of `1.7897962026112965e-17`. The 262,144-byte solution stayed with the prover. DER length varies with the test certificates and signatures. These historical fixtures test verification and interoperability. Separate live-issued FreeTSA and Sigstore receipts over a known digest are available for offline replay. [Public receipt examples](PUBLIC_TIMESTAMPS.md#verify-a-real-stamp-in-a-fresh-checkout) [End-to-end tests](tests/check_beacon.py)

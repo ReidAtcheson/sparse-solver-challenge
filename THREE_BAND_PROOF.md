@@ -1,6 +1,6 @@
 # What the three-band proof certifies
 
-The public challenge fixes a signed symmetric matrix $A$ and a right-hand side $b_i=\sigma_i/n$, where each $\sigma_i$ is $+1$ or $-1$. Its authenticated profile ID is `signed-three-band-backward80-v1`. The row count $n=2^\ell$ ranges from 1,024 to 65,536. The generator accepts singular draws as issued. A proof certifies the residual of one committed vector whether the system has a unique solution, many solutions, or none. [Matrix generator](THREE_BAND.md)
+The public challenge fixes a signed symmetric matrix $A$ and a right-hand side $b_i=\sigma_i/n$, where each $\sigma_i$ is $+1$ or $-1$. Its authenticated profile ID is `signed-three-band-backward80-v2`. The row count $n=2^\ell$ ranges from 1,024 to 65,536. The generator accepts singular draws as issued. A proof certifies the residual of one committed vector whether the system has a unique solution, many solutions, or none. [Matrix generator](THREE_BAND.md)
 
 ## Reading the validator's score
 
@@ -25,7 +25,7 @@ The challenge requires the right-hand quantity to be at most $2^{-53}$. A pass c
 
 The two sumchecks reduce the residual and norm claims to an opening of the committed $X$ and a public matrix evaluation. At the final points, write $u_i$ and $v_j$ for the row and column interpolation weights. To compute $\sum_{ij}u_i A_{ij}v_j$, the validator regenerates each strict-upper entry $(i,j,s)$ once and adds $s(u_i v_j+u_j v_i)$. For a diagonal entry it adds $s u_i v_i$ once. It separately computes $\sum_i u_i\sigma_i$ from the public RHS generator. The row commitments and folded opening in the transcript authenticate the private vector's contribution. [Endpoint code](operator.c) · [Opening and sumcheck argument](SOUNDNESS.md)
 
-The validator holds $O(\sqrt n)$ interpolation weights and the generator's $O(n)$ incoming-edge counters. Counters start at one byte per column and widen if any counter overflows. The reference sampler consumes random draws for every future column, so regenerating this graph costs $O(n^2)$ time. The prover regenerates the pattern once and caches a packed sparse matrix for its two matrix passes. It releases that cache after constructing the transposed product. Each sumcheck uses a private scratch file of at most $32n$ bytes. The validator needs neither the private solution file nor any matrix file.
+The validator holds $O(\sqrt n)$ interpolation weights. The generator needs a ring of 16-bit counters out to the furthest possible offset, which uses $O(n^{2/3}+200)$ space. Each of the three bands spans at most 401 integer offsets, so the total pattern scan takes $O(n)$ work. The prover regenerates the pattern once and caches a packed sparse matrix for its two matrix passes. It releases that cache after constructing the transposed product. Each sumcheck uses a private scratch file of at most $32n$ bytes. The validator needs neither the private solution file nor any matrix file.
 
 ## Integer lifting
 

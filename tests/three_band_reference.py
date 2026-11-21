@@ -1,4 +1,4 @@
-"""Check the signed three-band recipe and NumPy 2.3.5 replay vectors."""
+"""Check the bounded signed three-band recipe and replay vectors."""
 
 import argparse
 import hashlib
@@ -9,13 +9,13 @@ import unittest
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from examples.three_band_reference import SIGMA, draw_signs, generate_pattern, sign_pattern
+from examples.three_band_reference import SIGMA, band_centers, draw_signs, gaussian_weight, generate_pattern, sign_pattern
 
 
 def literal_pattern(n, seed):
-    """Use explicit column subsets and Gumbel indices to check masking and fallbacks."""
+    """Full-space oracle with libm Gaussian weights and NumPy cumulative probabilities."""
     rng = np.random.default_rng(seed)
-    centers = [1.0, np.cbrt(n), np.cbrt(n)**2]
+    centers = band_centers(n)
     uses = np.zeros(n, dtype=int)
     edges = []
     fallbacks = tails = 0
@@ -30,13 +30,17 @@ def literal_pattern(n, seed):
                     break
                 center = 1.0
                 fallbacks += 1
+            deviation = np.abs(remaining - i - center)
+            tail = (deviation >= 100) & (deviation <= 200)
             subset = remaining[within]
-            if (~within).any() and rng.random() < 0.01:
-                subset = remaining[~within]
+            if tail.any() and rng.random() < 0.01:
+                subset = remaining[tail]
                 tails += 1
-            noise = rng.gumbel(size=len(all_future))[subset - i - 1]
-            penalty = 0.5*((subset-i-center)/SIGMA)**2 + uses[subset]*np.log(2.0)
-            j = subset[np.argmax(noise - penalty)]
+            base = np.exp(-0.5 * ((subset-i-center)/SIGMA)**2)
+            weights = np.ldexp(base, int(uses[subset].min()) - uses[subset])
+            cdf = np.cumsum(weights)
+            j = subset[np.searchsorted(cdf, rng.random()*cdf[-1], side="right")]
+            assert abs((j-i) - center) <= 200
             edges.append((i, j))
             uses[j] += 1
             remaining = remaining[remaining != j]
@@ -44,6 +48,11 @@ def literal_pattern(n, seed):
 
 
 def check_patterns():
+    for root in (2, 3, 11, 32, 101, 1000):
+        assert band_centers(root**3) == (1.0, float(root), float(root*root))
+    for d in np.linspace(-200, 200, 2049):
+        expected = np.exp(-0.5 * (d/SIGMA)**2)
+        assert abs(gaussian_weight(float(d))/expected - 1) < 2e-14
     n = 1331
     pattern = generate_pattern(n, 42)
     expected, fallbacks, tails = literal_pattern(n, 42)
@@ -53,7 +62,7 @@ def check_patterns():
     assert np.all(pattern.edges[:, 0] < pattern.edges[:, 1])
     assert len(np.unique(pattern.edges, axis=0)) == len(pattern.edges)
     digest = hashlib.sha256(pattern.edges.astype("<u8").tobytes()).hexdigest()
-    assert digest == "8e9b6b259b705e99f5f894f51e2ea4e84eb85e840b641685d40bf100e981b7dd"
+    assert digest == "5fa745337561f35f7c00894f764744883b07f40478d212c034955cc6c7c0e038"
     edge, diagonal = draw_signs(pattern, sign_draw=7)
     signs = np.concatenate((edge, diagonal)).astype("i1")
     assert hashlib.sha256(signs.tobytes()).hexdigest() == (
@@ -64,7 +73,7 @@ def check_patterns():
     # The noncube exercises fractional centers. A rotation distinguishes scatter from gather.
     pattern = generate_pattern(128, 42)
     assert hashlib.sha256(pattern.edges.astype("<u8").tobytes()).hexdigest() == (
-        "0c8fa0ef75416d59576932f6f14c7a2171a3dd975cd0f2ff94212b02c7977a38")
+        "15df129bbddbd3b7a4502ba2aa0f35b50729d40210d5143143357e96921df3ea")
     rng = np.random.default_rng(987)
     wanted_edges = rng.choice([-1.0, 1.0], size=len(pattern.edges))
     wanted_diag = rng.choice([-1.0, 1.0], size=pattern.n)

@@ -14,7 +14,7 @@ sys.path.insert(0, str(ROOT / "examples"))
 from library_solve import Handle, checked, load, run
 
 PROFILES = (
-    ("start", "signed-three-band-backward80-v1", 1024, 1),
+    ("start", "signed-three-band-backward80-v2", 1024, 1),
     ("startblog", "july-tridiagonal-fixed-nonce-80-v1", 1024, 1),
     ("startsigned3d", "signed-unit-torus-3d-backward80-v2", 32, 3),
     ("start3d", "seeded-stencil-3d-exact-residual-v1", 32, 3),
@@ -50,7 +50,8 @@ def check_profile(work, api, binary, command, profile, side, dimensions):
         subprocess.run([binary, *map(str, args)], cwd=work, check=True)
 
     start = work / command
-    cli(command, "sk", side, "ffi-test", start)
+    start_command = (command,) if command == "start" else ("fixture", command)
+    cli(*start_command, "sk", side, "ffi-test", start)
     seed = hashlib.sha256(b"stencil-instance-seed-v1" + start.read_bytes()).digest()
     seed_buf = (C.c_uint8 * 32).from_buffer_copy(seed)
     a, b = Handle(), Handle()
@@ -125,6 +126,12 @@ if __name__ == "__main__":
         for case in PROFILES:
             check_profile(work, api, binary, *case)
         public = work / "public"
-        run(public, 1024, binary, library)
+        # A known miss exercises the full private FD handoff on a verifier-only
+        # build, including machines with neither SciPy nor the optional C solver.
+        def test_candidate(api, instance, x):
+            x[0] = 1 / len(x)
+        assert run(public, 1024, binary, library, solve=test_candidate) == 3
+        start = (public / "start.receipt").read_bytes()
+        assert start[88:128].rstrip(b"\0") == b"signed-three-band-backward80-v2"
         assert {p.name for p in public.iterdir()} == {"authority.pub", "start.receipt", "proof.bin"}
     print("PASS in-memory CSR profiles, CLI-identical commitments, private fd handoff and public replay")

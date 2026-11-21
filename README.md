@@ -1,6 +1,6 @@
 # Sparse Solver Challenge
 
-Solve a public, seeded **signed three-band** sparse system $Ax=b$ using any solver. Commit to your solution, get a timestamp on the commitment, and generate a non-interactive proof. Someone else can check your numerical result on their own machine from the proof and public challenge inputs. Your full solution stays with you.
+Solve a public, seeded **bounded signed three-band** sparse system $Ax=b$ using any solver. Commit to your solution, get a timestamp on the commitment, and generate a non-interactive proof. Someone else can check your numerical result on their own machine from the proof and public challenge inputs. Your full solution stays with you.
 
 This repository contains the C reference prover and validator. There is currently no official submission endpoint or leaderboard. Keep a passing transcript for bragging rights, share a replay command, or agree on a challenge and clock with another team.
 
@@ -16,15 +16,15 @@ On Debian or Ubuntu, install `build-essential pkg-config libssl-dev libsodium-de
 git clone https://github.com/ReidAtcheson/sparse-solver-challenge.git
 cd sparse-solver-challenge
 make
-fixture=benchmarks/three-band-cloud/public
+fixture=benchmarks/bounded-three-band/public
 ./stencil verify "$fixture/authority.pub" "$fixture/proof.bin" "$fixture/start.receipt"
 ```
 
-That transcript is 16,716 bytes for 32,768 unknowns. Look for `rows=32768` and `target=pass`. The validator regenerates the signed matrix and RHS from the authenticated start. Run `make check` for regression and altered-proof tests. [Cloud timings, process memory and transcript sizes](benchmarks/THREE_BAND.md)
+Look for `target=pass` and the certified numerical score. The validator regenerates the signed matrix and RHS from the authenticated start. Run `make check` for regression and altered-proof tests. [End-to-end timings, peak RSS and proof sizes](benchmarks/bounded-three-band/README.md)
 
 ## Play a round
 
-Each fresh seed draws a symmetric sparse matrix with $7n-12$ entries of magnitude one, including a signed diagonal. The three bands are centered at offsets $1$, $n^{1/3}$ and $n^{2/3}$. Random positions, tail draws and signs change across challenges. Each RHS entry is $+1/n$ or $-1/n$. The instance is issued as drawn, including a possible singular matrix. The registered row counts are powers of two from 1,024 through 65,536. [Generator and seed derivation](THREE_BAND.md)
+Each fresh seed draws a symmetric sparse matrix with $7n-12$ entries of magnitude one, including a signed diagonal. The three bands are centered at offsets $1$, $n^{1/3}$ and $n^{2/3}$. Each band reaches at most 200 columns on either side of its center. Where eligible, 1% of draws come from the 100–200-index tail. Positions and signs change with the seed. Each RHS entry is $+1/n$ or $-1/n$. The instance is issued as drawn, including a possible singular matrix. The registered row counts are powers of two from 1,024 through 65,536. [Generator and seed derivation](THREE_BAND.md)
 
 Run these commands in one shell from the repository root. This practice round creates its own receipt issuer.
 
@@ -49,7 +49,7 @@ cd "$run"
 printf 'Replay bundle: %s/public\n' "$run"
 ```
 
-**Use your own solver.** Open the signed start with `stencil_instance_open` and request matrix rows and RHS entries with `stencil_rows`. Write `private/x.f64` as exactly one little-endian binary64 per unknown in original index order, without a header. The same `commit`, `prove` and `verify` commands then work. You can also commit a contiguous in-memory solution through `libstencil.so`. The reference SuperLU solver performs fresh symbolic ordering, factorization and two refinement steps on each draw. [C API](stencil.h) · [SuperLU solver](three_band_lu.c)
+**Use your own solver.** Open the signed start with `stencil_instance_open` and request matrix rows and RHS entries with `stencil_rows`. Write `private/x.f64` as exactly one little-endian binary64 per unknown in original index order, without a header. The same `commit`, `prove` and `verify` commands then work. You can also commit a contiguous in-memory solution through `libstencil.so`. The reference SuperLU solver performs fresh symbolic ordering, factorization and two refinement steps on each draw. The Python example shows how to solve the same challenge with SciPy and commit the in-memory vector. [C API](stencil.h) · [Python example](examples/library_solve.py) · [SuperLU solver](three_band_lu.c)
 
 **Read the result.** `rho` is the exact integer squared residual in the profile's units. The validator computes a certified upper bound on joint 2-norm backward error for the committed fixed-point vector. It uses $L=\sqrt{(7n-12)/n}\leq\|A\|_2$ in the denominator. Passing requires `backward_2_upper` at most $2^{-53}$, checked with integers. The validator returns **0** for a verified pass, **3** for a verified score that missed the target, **1** for rejection or an operational error, and **2** for incorrect command syntax. The `elapsed_ns` field runs from challenge start to receipt of the **commitment digest**. Proof generation can finish later. [Exact score and integer bounds](THREE_BAND_PROOF.md)
 
@@ -67,9 +67,9 @@ For a common public start, the external receipt mode uses a preregistered drand 
 
 **Use a public timestamp authority.** The external match supports FreeTSA and Sigstore Public Good. After a commitment, run `./examples/public-tsa sigstore stamp-commit reg start digest stamp.tsr`. Anyone with the registered public inputs can check it offline with `./examples/public-tsa sigstore verify-commit reg start digest stamp.tsr`. The guide includes live-issued stamps from both providers, an independent OpenSSL check, and a complete Quicknet/Sigstore attempt for offline replay. [Public timestamp authorities](PUBLIC_TIMESTAMPS.md)
 
-## Protocol and generators
+## Protocol and matrix generator
 
-The authenticated profile ID is `signed-three-band-backward80-v1`. A public verifier streams the seeded edges and accumulates both symmetric contributions. Its generator uses a column-counter array linear in $n$ and takes quadratic time to replay the specified random draws. [Three-band generator](THREE_BAND.md) · [Proof specification](THREE_BAND_PROOF.md)
+New local and drand registrations issue a single matrix profile. Its authenticated ID is `signed-three-band-backward80-v2`. A public verifier streams the seeded edges and accumulates both symmetric contributions. Each draw examines at most 401 offsets. With at most three draws per row, regenerating the complete pattern takes linear work. [Three-band generator](THREE_BAND.md) · [Generation speed and ordering reuse](benchmarks/BOUNDED_PATTERN.md) · [Proof specification](THREE_BAND_PROOF.md)
 
 Independent provers can target the published transcript format and test against known answers. The protocol is a research implementation with documented soundness and trust assumptions. [Prover](PROVER.md) · [Validator](VALIDATOR.md) · [Wire format and test vectors](INTEROP.md) · [Soundness analysis](SOUNDNESS.md)
 

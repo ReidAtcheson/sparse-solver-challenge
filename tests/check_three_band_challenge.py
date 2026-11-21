@@ -36,7 +36,7 @@ def check(root):
     run(private, "keygen", "sk", "pub")
     run(private, "start", "sk", N, "round", "start")
     start = (private / "start").read_bytes()
-    assert start[88:128].rstrip(b"\0") == b"signed-three-band-backward80-v1"
+    assert start[88:128].rstrip(b"\0") == b"signed-three-band-backward80-v2"
     seed = hashlib.sha256(b"stencil-instance-seed-v1" + start).digest()
     pattern, sign, rhs1, rhs2 = struct.unpack("<4Q", seed)
     # The standalone generator and arbitrary dyadic x give an oracle independent
@@ -80,7 +80,12 @@ def check(root):
 if __name__ == "__main__":
     with tempfile.TemporaryDirectory() as temp:
         check(Path(temp))
-    archived = BINARY.parent / "benchmarks/three-band-cloud/public"
-    replay = run(archived, "verify", "authority.pub", "proof.bin", "start.receipt")
-    assert "target=pass" in replay and "backward_2_upper=" in replay
-    print("PASS default profile, integer energies and score, tampering, challenge binding and archived proof")
+    for directory, expected_id in (
+        ("bounded-three-band", b"signed-three-band-backward80-v2"),
+        ("three-band-cloud", b"signed-three-band-backward80-v1"),
+    ):
+        archived = BINARY.parent / "benchmarks" / directory / "public"
+        assert (archived / "start.receipt").read_bytes()[88:128].rstrip(b"\0") == expected_id
+        replay = run(archived, "verify", "authority.pub", "proof.bin", "start.receipt")
+        assert "target=pass" in replay and "backward_2_upper=" in replay
+    print("PASS bounded profile, exact energies and score, tamper checks and both archived replays")

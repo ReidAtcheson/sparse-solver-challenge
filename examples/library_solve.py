@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Solve the registered July tridiagonal fixture through libstencil.
+"""Solve the bounded three-band challenge in memory with SciPy and libstencil.
 
-    make stencil libstencil.so
+    make
     python3 examples/library_solve.py output-directory
 
-Linux, Python standard library. Uses the local timing provider for this demo.
+Linux, Python 3, NumPy and SciPy. This demo uses local signed practice receipts.
 Only authority.pub, start.receipt and proof.bin are published in a new directory.
 """
 import argparse
@@ -45,41 +45,38 @@ def checked(status):
         raise OSError(status, os.strerror(status))
 
 
-def solve_tridiagonal(api, instance, x):
-    """Thomas elimination from generated CSR batches. x stores the modified RHS."""
+def solve_sparse(api, instance, x):
+    """Get the seeded system in CSR form and write the refined solution into x."""
+    import numpy as np
+    from scipy.sparse import csr_matrix
+    from scipy.sparse.linalg import splu
+
     n = len(x)
-    upper = (C.c_double * n)()
-    batch = min(n, 256)
-    capacity = api.stencil_max_row_terms(instance) * batch
-    cols = (C.c_uint32 * capacity)()
-    vals = (C.c_double * capacity)()
-    offsets = (C.c_uint64 * (batch + 1))()
-    rhs = (C.c_double * batch)()
-    for first in range(0, n, batch):
-        count = min(batch, n - first)
-        checked(api.stencil_rows(instance, first, count, offsets, cols, vals, capacity, rhs))
-        for k in range(count):
-            i = first + k
-            lower = diag = above = 0.0
-            for j in range(offsets[k], offsets[k + 1]):
-                if cols[j] == i - 1:
-                    lower = vals[j]
-                elif cols[j] == i:
-                    diag = vals[j]
-                elif cols[j] == i + 1:
-                    above = vals[j]
-                else:
-                    raise ValueError("expected the July tridiagonal profile")
-            if i:
-                diag -= lower * upper[i - 1]
-                rhs[k] -= lower * x[i - 1]
-            upper[i] = above / diag
-            x[i] = rhs[k] / diag
-    for i in range(n - 2, -1, -1):
-        x[i] -= upper[i] * x[i + 1]
+    nnz = 7*n - 12
+    offsets = np.empty(n + 1, dtype=np.uint64)
+    columns = np.empty(nnz, dtype=np.uint32)
+    values = np.empty(nnz, dtype=np.float64)
+    rhs = np.empty(n, dtype=np.float64)
+    checked(api.stencil_rows(instance, 0, n, offsets.ctypes.data_as(U64),
+                             columns.ctypes.data_as(U32), values.ctypes.data_as(F64),
+                             nnz, rhs.ctypes.data_as(F64)))
+    if offsets[-1] != nnz:
+        raise ValueError("unexpected entry count for bounded three-band system")
+    a = csr_matrix((values, columns, offsets), shape=(n, n))
+    factors = splu(a.tocsc(), permc_spec="MMD_AT_PLUS_A")
+    solution = np.ctypeslib.as_array(x)
+    solution[:] = factors.solve(rhs)
+    # Accumulate residuals in extended precision and reuse the binary64 factors.
+    high_a = a.astype(np.longdouble)
+    high_rhs = rhs.astype(np.longdouble)
+    for _ in range(2):
+        residual = high_rhs - high_a @ solution
+        solution += factors.solve(residual.astype(np.float64))
 
 
-def run(output, rows, binary, library):
+def run(output, rows, binary, library, solve=solve_sparse):
+    """Return the validator exit code after replay against the public bundle."""
+    binary = Path(binary).resolve()
     api = load(library)
     output.mkdir()
     pub, start, proof = (output / name for name in ("authority.pub", "start.receipt", "proof.bin"))
@@ -92,7 +89,7 @@ def run(output, rows, binary, library):
             subprocess.run([binary, *map(str, args)], check=True, **options)
 
         cli("keygen", sk, pub)
-        cli("startblog", sk, rows, "python-example", start)
+        cli("start", sk, rows, "python-example", start)
         handle = Handle()
         checked(api.stencil_instance_open(os.fsencode(pub), os.fsencode(start), C.byref(handle)))
         try:
@@ -104,7 +101,7 @@ def run(output, rows, binary, library):
                 with mmap.mmap(witness.fileno(), 0) as memory:
                     x = (C.c_double * n).from_buffer(memory)
                     try:
-                        solve_tridiagonal(api, handle, x)
+                        solve(api, handle, x)
                         cache = (C.c_uint8 * api.stencil_commit_size(handle))()
                         digest = (C.c_uint8 * 32)()
                         checked(api.stencil_commit(handle, x, n, cache, len(cache), digest))
@@ -120,7 +117,7 @@ def run(output, rows, binary, library):
                     pass_fds=(fd,))
         finally:
             api.stencil_close(handle)
-    cli("verify", pub, proof, start)
+    return subprocess.run([binary, "verify", pub.name, proof.name, start.name], cwd=output).returncode
 
 
 if __name__ == "__main__":
@@ -128,4 +125,9 @@ if __name__ == "__main__":
     parser.add_argument("output", type=Path, help="new directory for public artifacts")
     parser.add_argument("--rows", type=int, default=1024)
     args = parser.parse_args()
-    run(args.output.resolve(), args.rows, ROOT / "stencil", ROOT / "libstencil.so")
+    # Load the numerical backend before the signed clock starts.
+    try:
+        import scipy.sparse.linalg
+    except ImportError as error:
+        parser.exit(2, f"Install NumPy and SciPy to run this solver example ({error}).\n")
+    raise SystemExit(run(args.output.resolve(), args.rows, ROOT / "stencil", ROOT / "libstencil.so"))

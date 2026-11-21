@@ -121,7 +121,7 @@ def run_size(args, helper, exporter, spec, n, work, report, checkpoint):
                                {**os.environ, "TMPDIR": str(p)}, case, name, checkpoint)
 
             stage("keygen", "keygen", "sk", "pk")
-            stage("start", "startblog", "sk", n, f"july-{n}-{trial}", "start")
+            stage("start", "fixture", "startblog", "sk", n, f"july-{n}-{trial}", "start")
             if (p/"start").read_bytes()[88:128].rstrip(b"\0") != PROFILE:
                 raise ValueError("unexpected signed profile")
             stage("solve", "solve", "pk", "start", "x")

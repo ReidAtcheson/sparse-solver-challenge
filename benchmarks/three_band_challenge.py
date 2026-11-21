@@ -14,7 +14,7 @@ from run import ROOT, sha
 from run3d import machine, measure, write_json
 
 
-PROFILE = b"signed-three-band-backward80-v1"
+PROFILE = b"signed-three-band-backward80-v2"
 
 
 def trial(helper, binary, case, work, checkpoint, public_dir):

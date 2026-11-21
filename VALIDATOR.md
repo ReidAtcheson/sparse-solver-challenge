@@ -1,6 +1,6 @@
 # Validator pseudocode for the signed three-band challenge
 
-The validator takes a proof byte stream, the authority’s pinned public key, and optionally the signed start received directly for the attempt. The `signed-three-band-backward80-v1` profile has $m$ rows and $b_i=\sigma_i/m$, where $\sigma_i=\pm1$. Its outputs are two exact integer energies, an upper bound on joint 2-norm backward error, and the time from challenge release to the stamped solution commitment. The prover’s private binary64 file stays with the prover. [Companion prover pseudocode](PROVER.md)
+The validator takes a proof byte stream, the authority’s pinned public key, and optionally the signed start received directly for the attempt. The `signed-three-band-backward80-v2` profile has $m$ rows and $b_i=\sigma_i/m$, where $\sigma_i=\pm1$. Its outputs are two exact integer energies, an upper bound on joint 2-norm backward error, and the time from challenge release to the stamped solution commitment. The prover’s private binary64 file stays with the prover. [Companion prover pseudocode](PROVER.md)
 
 ## Check the receipts and read the claims
 
@@ -116,4 +116,4 @@ The matrix-shaped commitment and its row folding follow the construction describ
 
 Passing certifies joint normwise backward error at most $2^{-53}$ for the encoded solution. The integer tests establish whether the reported upper bound meets that target. [Numerical score and integer lifting](THREE_BAND_PROOF.md) · [Higham, *Testing Linear Algebra Software*, §2.1](https://nhigham.com/wp-content/uploads/2023/10/high97t.pdf)
 
-**Validator resources.** Factor each equality weight into high- and low-index tables of sizes $H$ and $w$. The validator reads the folded row from the proof and streams the generated edges and masks. The equality tables occupy $O(\sqrt m)$ space. The pattern generator adds $O(m)$ incoming-column counters. Each counter starts at one byte. The validator never materializes the sparse matrix or the solution. [C verifier](protocol.c) · [Public endpoint scan](operator.c)
+**Validator resources.** Factor each equality weight into high- and low-index tables of sizes $H$ and $w$. The validator reads the folded row from the proof and streams the generated edges and masks. The equality tables occupy $O(\sqrt m)$ space. The pattern generator keeps 16-bit incoming-column counts in a ring of size $O(m^{2/3}+200)$. The validator never materializes the sparse matrix or the solution. [C verifier](protocol.c) · [Public endpoint scan](operator.c)

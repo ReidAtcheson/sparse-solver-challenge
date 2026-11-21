@@ -19,7 +19,8 @@ struct rc_info {
     uint8_t entry[32];
     uint8_t digest[RC_DIGEST_BYTES];
     /* Exact authenticated generator. Pre-v3 custom providers may omit it
-     * when dimensions and encoding uniquely identify a registered profile. */
+     * to replay their historical dimension/encoding mapping. Bounded three-band
+     * providers must set this pointer to the authenticated v2 profile. */
     const struct matrix_profile *profile;
 };
 
@@ -57,8 +58,8 @@ int rc_verify_start(const char *trust, const uint8_t *start, struct rc_info *out
 int rc_verify_pair(const char *trust, const uint8_t *start, const uint8_t *finish,
                    struct rc_info *out);
 
-/* start registers a three-band challenge; start2d, start3d, startsigned3d
- * and startblog create fixtures. The stdio endpoint reads
+/* start registers the bounded three-band challenge. Legacy issuance is a
+ * fixture-only command dispatched by the CLI. The stdio endpoint reads
  * exactly START || digest, checks the authority-supplied authenticated entrant
  * label, and writes the recorded FINISH receipt. Returns a process exit code. */
 int receipt_main(int argc, char **argv);

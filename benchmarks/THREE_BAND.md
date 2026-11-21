@@ -1,4 +1,6 @@
-# Signed three-band cloud benchmark
+# Archived three-band v1 cloud benchmark
+
+The measurements and public example on this page use the original unbounded v1 generator. To rerun the historical harness, check out commit `c62e1a3`. Results for the active bounded generator are published separately. [Bounded pattern and ordering](BOUNDED_PATTERN.md) · [Bounded challenge round trips](bounded-three-band/README.md)
 
 One fresh challenge at each size on a Google Compute Engine n2-standard-8 VM in us-central1-a. The host reported Intel(R) Xeon(R) CPU @ 2.80GHz and 8 vCPUs. The numerical solver used one thread with SuperLU 6.0.1, OpenBLAS 0.3.26, and the symmetric minimum-degree ordering on the pattern of A + Aᵀ. The compiler was GCC 13.3.0 on Ubuntu 24.04. Every draw was accepted as issued and every transcript passed the $2^{-53}$ threshold. The clock used local Ed25519 practice receipts. These are single observations per size and include process startup. [Raw measurements, seeds and receipt metadata](three-band-cloud/results.json)
 
