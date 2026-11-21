@@ -219,9 +219,9 @@ static int record_digest(const char *directory, const uint8_t attempt[32],
     return ok;
 }
 
-/* Run on the registrar under authenticated entrant access, in its own ledger
- * directory. Selecting a winner per attempt prevents shopping across digests. */
-static int record(char **a)
+/* The offline check and the registrar authenticate exactly the same evidence.
+ * The registrar additionally selects one winner in its own ledger directory. */
+static int verify_submission(char **a, const char *ledger)
 {
     uint8_t start[RC_START_BYTES], digest[32];
     struct rc_info info;
@@ -233,8 +233,13 @@ static int record(char **a)
     if (!der) return 0;
     int ok = check_stamp(a[2], a[3], start, digest, der, len, &info, &error);
     free(der);
-    return ok && drand_quicknet_time(le(start + PROOF_ROUND, 8), &cutoff) &&
-           record_digest(a[7], info.attempt, digest, cutoff, le(start + CLOCK_ERROR, 8));
+    if (!ok) return 0;
+    if (ledger)
+        return drand_quicknet_time(le(start + PROOF_ROUND, 8), &cutoff) &&
+               record_digest(ledger, info.attempt, digest, cutoff, le(start + CLOCK_ERROR, 8));
+    return printf("start_scheduled_ns=%" PRIu64 " commitment_utc_ns=%" PRIu64
+                  " clock_uncertainty_ns=%" PRIu64 "\n",
+                  info.start_ns, info.finish_ns, error) >= 0;
 }
 
 int bc_main(int argc, char **argv)
@@ -246,12 +251,15 @@ int bc_main(int argc, char **argv)
         ok = start_receipt(argv);
     else if (!strcmp(argv[0], "beacon-query") && (argc == 5 || argc == 6))
         ok = make_query(argv, argc == 6 ? argv[5] : NULL);
+    else if (!strcmp(argv[0], "beacon-verify-stamp") && argc == 7)
+        ok = verify_submission(argv, NULL);
     else if (!strcmp(argv[0], "beacon-record") && argc == 8)
-        ok = record(argv);
+        ok = verify_submission(argv, argv[7]);
     else {
         fputs("  beacon-register {2d|3d|signed3d} SIDE ENTRY NONCE32 START_ROUND PROOF_ROUND CLOCK_ERROR_NS REG\n"
               "  beacon-start REG ROUND_SIG START\n"
               "  beacon-query REG START DIGEST REQUEST.tsq [POLICY_OID]\n"
+              "  beacon-verify-stamp REG CA.pem POLICY_OID START DIGEST RESPONSE.tsr\n"
               "  beacon-record REG CA.pem POLICY_OID START DIGEST RESPONSE.tsr LEDGER_DIR\n", stderr);
         return 2;
     }

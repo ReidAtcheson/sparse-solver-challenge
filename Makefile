@@ -57,6 +57,7 @@ check: all check-three-band tests/check-commit tests/check-generator tests/check
 	./tests/check-drand
 	python3 tests/check.py ./stencil
 	python3 tests/check_rfc3161.py ./stencil
+	python3 tests/check_public_tsa.py
 	python3 tests/library.py
 	python3 tests/check_interop.py
 ifneq ($(strip $(BLST_DIR)),)

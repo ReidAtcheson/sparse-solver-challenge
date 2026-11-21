@@ -65,6 +65,8 @@ For a reproducible write-up, include the repository commit, solver and hardware,
 
 For a common public start, the external receipt mode uses a preregistered drand Quicknet round to seed everyone's system, RFC 3161 to timestamp the committed digest, and a second fixed drand round to supply proof randomness. An organizer records the first eligible digest for each attempt. To replay it offline, the verifier needs the transcript plus the organizer's registration, TSA trust settings and winning digest. Anyone can organize a match. [External match and verification commands](BEACON.md)
 
+**Use a public timestamp authority.** The external match supports FreeTSA and Sigstore Public Good. After a commitment, run `./examples/public-tsa sigstore stamp-commit reg start digest stamp.tsr`. Anyone with the registered public inputs can check it offline with `./examples/public-tsa sigstore verify-commit reg start digest stamp.tsr`. The guide includes live-issued stamps from both providers, an independent OpenSSL check, and a complete Quicknet/Sigstore attempt for offline replay. [Public timestamp authorities](PUBLIC_TIMESTAMPS.md)
+
 ## Protocol and generators
 
 The reference verifies registered challenge families. These include seeded 2D and 3D diffusion, the signed 3D torus above, and a fixed July tridiagonal comparison. The experimental signed three-band generator is available for solver and ordering experiments. It still needs a registered RHS and scoring specification to support benchmark proofs. [Three-band generator](THREE_BAND.md)

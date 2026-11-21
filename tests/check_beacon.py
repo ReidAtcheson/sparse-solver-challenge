@@ -100,6 +100,16 @@ def check(base, binary, clock):
     run(prover, binary, "beacon-query", "reg", "start", "digest", tsa / "query", POLICY)
     run(tsa, clock, "query", "1704067200", "token")   # 2024-01-01 UTC
     ca = tsa / "ca.pem"
+    verify_stamp = (binary, "beacon-verify-stamp", "reg", ca, POLICY, "start", "digest")
+    assert run(prover, *verify_stamp, tsa / "token").split() == [
+        "start_scheduled_ns=1692803367000000000", "commitment_utc_ns=1704067200000000000",
+        "clock_uncertainty_ns=2000000000"]
+    # A valid TSA signature directly over the row digest has a different
+    # imprint from the one required for this attempt.
+    run(prover, binary, "tsa-query", "digest", tsa / "bare.tsq", POLICY)
+    run(tsa, clock, "bare.tsq", "1704067200", "bare.tsr")
+    run(prover, binary, "tsa-verify", ca, "digest", tsa / "bare.tsr", POLICY)
+    run(prover, *verify_stamp, tsa / "bare.tsr", ok=False)
     prove = (binary, "prove-beacon", "reg", ca, POLICY, "start", "digest")
     run(prover, *prove, tsa / "token", end_sig, "x", "rows", "proof")
 
@@ -140,6 +150,8 @@ def check(base, binary, clock):
         "proof", ok=False)
     run(prover, binary, "beacon-register", "signed3d", "32", "alice", "nonce", start_sig,
         end_sig, "2000000000", validator / "other-reg")
+    run(prover, binary, "beacon-verify-stamp", validator / "other-reg", ca, POLICY,
+        "start", "digest", tsa / "token", ok=False)
     run(validator, binary, "verify-beacon", "other-reg", "ca.pem", POLICY, "digest",
         "proof", ok=False)
     check_signed3d(base, binary, clock, validator / "other-reg", prover / start_sig,
@@ -162,6 +174,7 @@ def check(base, binary, clock):
     # second boundary the lower limit overlaps the start round.
     for seconds in ("1794803363", "1692803368"):
         run(tsa, clock, "query", seconds, "overlap")
+        run(prover, *verify_stamp, tsa / "overlap", ok=False)
         run(prover, *prove, tsa / "overlap", end_sig, "x", "rows", "reject", ok=False)
     run(prover, *prove, tsa / "token", start_sig, "x", "rows", "reject", ok=False)
     # The TSA certificate is currently valid, but did not exist at genTime.

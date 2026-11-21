@@ -1,0 +1,2 @@
+examples/tsa/*.tsr binary
+examples/tsa/quicknet-sigstore/* binary

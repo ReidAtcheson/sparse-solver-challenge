@@ -724,7 +724,7 @@ int main(int argc, char **argv)
           "  prove PUBLIC START FINISH SOLUTION.f64 ROWS PROOF\n"
           "  verify PUBLIC PROOF [EXPECTED_START]\n"
           "  three-band N PATTERN_SEED [--sign-draw ID | --sign-seed SEED] [--perm FILE] > matrix.mtx\n"
-          "  beacon-register | beacon-start | beacon-query | beacon-record  (see BEACON.md)\n"
+          "  beacon-register | beacon-start | beacon-query | beacon-verify-stamp | beacon-record  (see BEACON.md)\n"
           "  tsa-query DIGEST REQUEST.tsq [POLICY_OID] | tsa-verify CA.pem DIGEST RESPONSE.tsr [POLICY_OID]\n"
           "  prove-beacon REG CA.pem POLICY_OID START DIGEST RESPONSE.tsr ROUND_SIG SOLUTION.f64 ROWS PROOF\n"
           "  verify-beacon REG CA.pem POLICY_OID REGISTERED_DIGEST PROOF\n",

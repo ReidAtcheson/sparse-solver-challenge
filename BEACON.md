@@ -2,6 +2,8 @@
 
 A judge publishes a registration for each entrant before a common start round. When that round arrives, everyone in the same profile and grid size gets the same seeded system. Each entrant solves the system, computes its row commitments, obtains an RFC 3161 timestamp and registers its digest. A second fixed drand round supplies unpredictable bits for the proof. The entrant can do the expensive proving work after that round. The score uses the timestamp on the commitment.
 
+To use a public authority, choose the FreeTSA or Sigstore preset and its trust settings before registration. The step-by-step guide covers issuance, offline verification and both real example receipts. [Public timestamp authorities](PUBLIC_TIMESTAMPS.md)
+
 ## Build and run
 
 The optional Quicknet backend uses blst. The reference was tested with v0.3.16, commit `e7f90de551e8df682f3cc99067d204d8b90d27ad`. Build blst in its own directory using its provided `./build.sh`, then pass its absolute directory to make. The ordinary build supports the local Ed25519 provider and standalone RFC 3161 requests and verification. It rejects Quicknet signatures when the BLS backend is unavailable. [blst release](https://github.com/supranational/blst/releases/tag/v0.3.16)
@@ -38,6 +40,8 @@ round_signature "$START_ROUND" > start.sig
 curl -fsS -H 'Content-Type: application/timestamp-query' \
      -H 'Accept: application/timestamp-reply' --data-binary @request.tsq "$TSA_URL" -o stamp.tsr
 ```
+
+To check this stamp independently before the proof round, run `./stencil beacon-verify-stamp reg tsa-ca.pem "$POLICY_OID" start digest stamp.tsr`. It authenticates the attempt-bound imprint and enforces the registered time window without modifying the ledger.
 
 The registrar receives the digest and response through an authenticated entrant channel. It selects the matching registration and the ledger directory from its own configuration. Run the following on the registrar while the submission window is open. The command prints the path to the winning 32-byte digest, keyed by attempt. The registrar durably fixes a single candidate in an internal `.claim-*` file, checks the cutoff again, then publishes the accepted record. Only the final filename printed by the command is eligible. An identical retry can recover an accepted record after the deadline. Competing digests fail, including during concurrent submissions. Publish the accepted record over the judge's authenticated channel for validators. Protect the ledger from entrant writes.
 
@@ -98,4 +102,4 @@ The security argument assumes the signatures are unpredictable before their sche
 
 ## Offline reference check
 
-`make BLST_DIR=/absolute/path/to/blst check-beacon` exercises both the diffusion and signed-unit 3D profiles with archived, genuine Quicknet signatures and a locally issued RFC 3161 test response. In one signed 32³ run the transcript occupied 17,552 bytes, including a 912-byte response, and certified a joint backward error of `1.7897962026112965e-17`. The 262,144-byte solution stayed with the prover. DER length varies with the test certificates and signatures. These historical fixtures test verification and interoperability. Live service latency is a separate measurement. [End-to-end tests](tests/check_beacon.py)
+`make BLST_DIR=/absolute/path/to/blst check-beacon` exercises both the diffusion and signed-unit 3D profiles with archived, genuine Quicknet signatures and a locally issued RFC 3161 test response. In one signed 32³ run the transcript occupied 17,552 bytes, including a 912-byte response, and certified a joint backward error of `1.7897962026112965e-17`. The 262,144-byte solution stayed with the prover. DER length varies with the test certificates and signatures. These historical fixtures test verification and interoperability. Separate live-issued FreeTSA and Sigstore receipts over a known digest are available for offline replay. [Public receipt examples](PUBLIC_TIMESTAMPS.md#verify-a-real-stamp-in-a-fresh-checkout) [End-to-end tests](tests/check_beacon.py)

@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+# Request DER RFC 3161 responses; verify a response before publishing it.
+set -euo pipefail
+
+usage() {
+    cat >&2 <<'USAGE'
+usage: examples/public-tsa {freetsa|sigstore} COMMAND [ARGS]
+  stamp DIGEST32 NEW_RESPONSE.tsr
+  verify DIGEST32 RESPONSE.tsr
+  stamp-commit REG START DIGEST32 NEW_RESPONSE.tsr
+  verify-commit REG START DIGEST32 RESPONSE.tsr
+  root
+  policy
+USAGE
+    exit 2
+}
+(( $# >= 2 )) || usage
+provider=$1
+action=$2
+shift 2
+case "$provider" in
+    freetsa)
+        url=https://freetsa.org/tsr
+        oid=1.2.3.4.1
+        fingerprint=a6379e7cecc05faa3cbf076013d745e327bbbaa38c0b9af22469d4701d18aabc ;;
+    sigstore)
+        url=https://timestamp.sigstore.dev/api/v1/timestamp
+        oid=1.3.6.1.4.1.57264.2
+        fingerprint=2aca8fea5d3ce48b01cc77076293c280e6c23ffe44034757ee7833ca9f45d633 ;;
+    *) usage ;;
+esac
+
+here=$(cd -- "$(dirname -- "$0")" && pwd)
+ca=$here/tsa/$provider-root.crt
+stencil=$here/../stencil
+# Pin the DER, so changing PEM line endings does not change the identity.
+actual=$(openssl x509 -in "$ca" -outform DER | sha256sum)
+if [[ ${actual%% *} != "$fingerprint" ]]; then
+    echo "Public TSA root fingerprint mismatch for $provider" >&2
+    exit 1
+fi
+
+case "$action" in
+    root|policy)
+        (( $# == 0 )) || usage
+        if [[ $action == root ]]; then printf '%s\n' "$ca"; else printf '%s\n' "$oid"; fi
+        exit 0 ;;
+    stamp|verify)
+        (( $# == 2 )) || usage
+        digest=$1; response=$2
+        query=(tsa-query "$digest")
+        verify=(tsa-verify "$ca" "$digest") ;;
+    stamp-commit|verify-commit)
+        (( $# == 4 )) || usage
+        reg=$1; start=$2; digest=$3; response=$4
+        query=(beacon-query "$reg" "$start" "$digest")
+        verify=(beacon-verify-stamp "$reg" "$ca" "$oid" "$start" "$digest") ;;
+    *) usage ;;
+esac
+
+verify_response() {
+    if [[ $action == verify || $action == stamp ]]; then
+        "$stencil" "${verify[@]}" "$1" "$oid"
+    else
+        "$stencil" "${verify[@]}" "$1"
+    fi
+}
+
+if [[ $action == verify || $action == verify-commit ]]; then
+    verify_response "$response"
+    exit 0
+fi
+if [[ -e $response || -L $response ]]; then
+    echo "Output already exists: $response" >&2
+    exit 1
+fi
+work=$(mktemp -d -- "$(dirname -- "$response")/.public-tsa.XXXXXXXX")
+trap 'rm -rf -- "$work"' EXIT
+# Both published endpoints issue their default policy. Require the chosen OID on
+# receipt, even if the responder supplies different policy information later.
+"$stencil" "${query[@]}" "$work/request.tsq"
+curl -q --fail --silent --show-error --proto '=https' --connect-timeout 10 --max-time 30 \
+     --max-filesize 1048576 -H 'Content-Type: application/timestamp-query' \
+     -H 'Accept: application/timestamp-reply' --data-binary "@$work/request.tsq" \
+     --output "$work/response.tsr" "$url"
+verify_response "$work/response.tsr"
+ln -T -- "$work/response.tsr" "$response"
